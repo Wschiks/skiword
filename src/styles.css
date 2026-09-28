@@ -196,3 +196,5 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #rotate { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; text-align: center; background: #24476b; color: #fff; font-weight: 700; padding: 24px; gap: 12px; flex-direction: column; }
 #rotate small { font-weight: 500; opacity: .8; }
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { #rotate { display: flex; } }
+
+.stats.wide { grid-template-columns: repeat(2, 1fr); gap: 8px 6px; margin-top: 10px; }
