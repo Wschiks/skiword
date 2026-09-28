@@ -1,6 +1,9 @@
 import { app } from '../app';
 import { OFFLINE } from '../config/balance';
-import { AREAS, areaDef } from '../config/areas';
+import { AREAS, areaDef, areaIndex } from '../config/areas';
+import { BUILDINGS } from '../config/facilities';
+import { ZONES } from '../config/zones';
+import { LODGE_POS, PARKING_POS, slotBase } from '../config/layout';
 import { PRODUCTS } from '../config/shop';
 import { QUESTS } from '../config/quests';
 import {
@@ -55,7 +58,7 @@ export function initUI() {
     <div id="quests" class="pe"></div>
     <div id="tut" class="pe hidden"></div>
     <div id="toasts" role="status" aria-live="polite"></div>
-    <div id="dock" class="pe"><button id="next" class="next" data-act="next"></button><button id="busfab" class="busfab hidden" data-act="busmodal">${icons.bus}<span>Ski Bus</span></button></div>
+    <div id="dock" class="pe"><button id="next" class="nextpill" data-act="next"></button><button id="busfab" class="busfab hidden" data-act="busmodal">${icons.bus}<span>Ski Bus</span></button></div>
     <div id="sheet" class="pe hidden"><div class="grab" id="grab"><i></i></div><div class="sheet-h"><div id="sheet-title" class="sheet-title"></div><button class="icon-btn" data-act="close" aria-label="Close">${icons.close}</button></div>
       <div id="sheet-hint" class="hintline"></div><div id="sheet-body" class="sheet-body"></div></div>
     <div id="tabs" class="pe">${TABS.map(t => `<button class="tab" data-act="tab" data-a="${t.id}" id="tab-${t.id}">${icons[t.icon]}<span>${t.label}</span><i class="dot hidden"></i></button>`).join('')}</div>
@@ -164,7 +167,30 @@ function fire(el: HTMLElement, x: number, y: number) {
     if (!res.silent) { sfx.buy(); haptic('medium'); confetti(x, y, 12); if (name === 'area') { sfx.fanfare(); toast(`Unlocked <b>${areaDef(a).name}</b>`, 'good'); } }
     else sfx.tap();
   } else { sfx.error(); haptic('light'); shake(el); }
+  if (res.ok && !res.silent) worldFeedback(name, a);
   renderAll(true);
+}
+
+/** show a purchase in the world: a burst at the thing, and for big ones a camera glide to it */
+function worldFeedback(name: string, a: string) {
+  const s = app.state;
+  const emit = (x: number, y: number, burst: number) => app.emit('focus', { x, y, burst });
+  switch (name) {
+    case 'area': { // a new area is the big moment: get the sheet out of the way and glide to the new territory
+      const [y0, y1] = areaDef(a).band;
+      closeSheet();
+      app.emit('focus', { x: 600, y: (y0 + y1) / 2, burst: 340, pan: true, yFrac: 0.5 });
+      break;
+    }
+    case 'bbuy': { const p = BUILDINGS.find(x => x.id === a)!.pos; emit(p.x, p.y - 40, 130); break; }
+    case 'bup': { const p = BUILDINGS.find(x => x.id === a)!.pos; emit(p.x, p.y - 40, 100); break; }
+    case 'zbuy': { const p = ZONES.find(x => x.id === a)!.pos; emit(p.x + 70, p.y - 30, 150); break; }
+    case 'zup': case 'zstage': { const p = ZONES.find(x => x.id === (name === 'zstage' ? 'park' : a))!.pos; emit(p.x + 70, p.y - 30, 110); break; }
+    case 'build': { const [area, slot] = a.split(':'); const p = slotBase(areaIndex(area), Number(slot)); emit(p.x, p.y - 60, 150); break; }
+    case 'rebuild': case 'lvl': { const l = s.lines.find(x => x.id === a); if (l) { const p = slotBase(areaIndex(l.areaId), l.slot); emit(p.x, p.y - 50, name === 'rebuild' ? 160 : 90); } break; }
+    case 'parking': emit(PARKING_POS.x + 20, PARKING_POS.y - 50, 140); break;
+    case 'housing': emit(LODGE_POS.x, LODGE_POS.y - 60, 140); break;
+  }
 }
 
 function handle(name: string, a: string, b: string, el: HTMLElement): ActResult {
@@ -410,6 +436,8 @@ function renderAll(immediate: boolean) {
     const tpulse = (t?.target === 'upgrade' || t?.target === 'rebuild') ? 'lifts' : t?.target === 'parking' ? 'people' : t?.target === 'mountain' ? 'mountain' : '';
     el.classList.toggle('pulse', tpulse === tb.id && open !== tb.id);
   }
+  // let the camera scroll the map above an open sheet (and make room for purchase glides)
+  if (scene) scene.mv.padBottom = open ? $('sheet').offsetHeight + 60 : 96;
   // sheet
   if (open) {
     $('sheet-title').textContent = TITLES[open];

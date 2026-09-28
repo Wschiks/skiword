@@ -127,7 +127,6 @@ function pickLift(s: GameState, g: Guest) {
 
 function startLeaving(s: GameState, g: Guest, angry: boolean) {
   g.angry = angry;
-  g.lineId = g.lineId; // kept for the view (no-op)
   move(g, homePos(g), homeWalk(g.area), 'leaving');
   if (angry) {
     s.stats.angryLeaves++;

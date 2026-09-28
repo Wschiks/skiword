@@ -301,6 +301,11 @@ export function bakeAll(scene: Phaser.Scene) {
     c.strokeStyle = '#fff'; c.lineWidth = 3.2; c.lineCap = 'round'; c.beginPath(); c.moveTo(15, 8); c.lineTo(15, 22); c.moveTo(8, 15); c.lineTo(22, 15); c.stroke();
   });
   bake(scene, 'flake', 6, 6, c => { c.fillStyle = 'rgba(255,255,255,0.95)'; c.beginPath(); c.arc(3, 3, 2.4, 0, 6.3); c.fill(); }, 2);
+  bake(scene, 'glow', 64, 64, c => {
+    const g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.35, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = g; c.fillRect(0, 0, 64, 64);
+  });
   bake(scene, 'dot', 4, 4, c => { c.fillStyle = '#fff'; c.beginPath(); c.arc(2, 2, 2, 0, 6.3); c.fill(); }, 2);
   bake(scene, 'ring', 64, 64, c => { c.strokeStyle = '#FF6B3D'; c.lineWidth = 3; c.beginPath(); c.arc(32, 32, 28, 0, 6.3); c.stroke(); }, 2);
   atlas.finish();

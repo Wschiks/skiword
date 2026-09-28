@@ -13,6 +13,7 @@ export class MapView {
   private moved = 0;
   fit = 0.33;
   private inited = false;
+  private pan: { t: number; dur: number; fx: number; fy: number; tx: number; ty: number; fz: number; tz: number } | null = null;
   onTap: (wx: number, wy: number) => void = () => {};
 
   constructor(private el: HTMLElement) {
@@ -62,12 +63,21 @@ export class MapView {
     this.clamp();
   }
 
+  /** Smooth camera glide so that world point (wx, wy) ends up at the given screen fraction (used after big purchases). */
+  panTo(wx: number, wy: number, zoomFactor?: number, screenYFrac = 0.5, dur = 0.9) {
+    const min = this.fit * ZOOM.minFactor, max = this.fit * ZOOM.maxFactor;
+    const tz = Math.min(max, Math.max(min, zoomFactor ? this.fit * zoomFactor : this.zoom));
+    this.pan = { t: 0, dur, fx: this.cx, fy: this.cy, tx: wx, ty: wy + ((0.5 - screenYFrac) * this.h) / tz, fz: this.zoom, tz };
+  }
+
   focus(wx: number, wy: number, zoomFactor?: number) {
+    this.pan = null;
     if (zoomFactor) this.zoom = this.fit * zoomFactor;
     this.cx = wx; this.cy = wy; this.clamp();
   }
 
   private down(e: PointerEvent) {
+    this.pan = null; // the player takes over
     this.el.setPointerCapture?.(e.pointerId);
     this.pointers.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
     if (this.pointers.size === 1) { this.downAt = { x: e.offsetX, y: e.offsetY, t: performance.now() }; this.moved = 0; this.vx = this.vy = 0; }
@@ -106,6 +116,17 @@ export class MapView {
   }
 
   update(dt: number) {
+    if (this.pan) {
+      const p = this.pan;
+      p.t += dt;
+      const u = Math.min(1, p.t / p.dur), k = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      this.zoom = p.fz + (p.tz - p.fz) * k;
+      this.cx = p.fx + (p.tx - p.fx) * k;
+      this.cy = p.fy + (p.ty - p.fy) * k;
+      this.clamp();
+      if (u >= 1) this.pan = null;
+      return;
+    }
     if (this.pointers.size === 0 && (Math.abs(this.vx) > 1 || Math.abs(this.vy) > 1)) {
       this.cx += this.vx * dt; this.cy += this.vy * dt;
       const k = Math.pow(0.02, dt);

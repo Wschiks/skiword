@@ -25,14 +25,24 @@ async function openTab(id) {
   await page.click('#tab-' + id); await wait(page, 120);
 }
 async function click(sel) {
-  const loc = page.locator(sel).first();
-  await loc.waitFor({ state: 'attached', timeout: 3000 });
-  await loc.scrollIntoViewIfNeeded();
-  const box = await loc.boundingBox();
-  const vis = await page.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return !!e && !!e.closest('#sheet, #tabs'); }, [box.x + box.width / 2, box.y + box.height / 2]);
-  if (!vis) throw new Error('button not visible/hittable: ' + sel);
-  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await wait(page, 90);
+  // locate + scroll + hit-test atomically inside the page (the sheet re-renders every 250 ms, so a Playwright locator can detach)
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const pos = await page.evaluate(s => {
+      const el = document.querySelector(s);
+      if (!el) return { missing: true };
+      el.scrollIntoView({ block: 'nearest' });
+      const b = el.getBoundingClientRect();
+      const x = b.left + b.width / 2, y = b.top + b.height / 2;
+      const top = document.elementFromPoint(x, y);
+      return { x, y, off: el.dataset.off === '1', hittable: !!top && (top === el || el.contains(top) || !!top.closest(s)) };
+    }, sel);
+    if (pos.missing) { await wait(page, 120); continue; }
+    if (!pos.hittable || pos.off) { await wait(page, 300); continue; } // 'off' = the UI has not refreshed its affordability yet (4 Hz)
+    await page.mouse.click(pos.x, pos.y);
+    await wait(page, 90);
+    return;
+  }
+  throw new Error('button not found or not hittable after retries: ' + sel);
 }
 
 async function buyViaUi(key) {
@@ -52,17 +62,17 @@ async function buyViaUi(key) {
   else throw new Error('unknown purchase key ' + key);
 }
 
-let steps = 0, ok = 0, lastFail = '';
+let steps = 0, ok = 0, lastFail = '', consecutiveFails = 0;
 while (steps < MAX_STEPS) {
   const p = await step();
   if (p.done) break;
-  if (p.wait > 0) { await page.evaluate(w => window.__core.simulate(window.__app.state, Math.min(w + 1, 900)), p.wait); await wait(page, 120); continue; }
+  if (p.wait > 0) { await page.evaluate(w => window.__core.simulate(window.__app.state, Math.min(w + 1, 900)), p.wait); await wait(page, 320); continue; }
   steps++;
   const before = await snapshot();
-  try { await buyViaUi(p.key); } catch (e) { failed++; lastFail = `${p.key}: ${String(e).slice(0, 140)}`; console.log('FAIL  UI purchase', lastFail); await page.evaluate(() => document.querySelector('[data-act="close"]')?.click()); continue; }
+  try { await buyViaUi(p.key); } catch (e) { failed++; consecutiveFails++; lastFail = `${p.key}: ${String(e).slice(0, 140)}`; console.log('FAIL  UI purchase', lastFail); await page.evaluate(() => document.querySelector('[data-act="close"]')?.click()); if (consecutiveFails >= 8) break; continue; }
   const after = await snapshot();
-  if (before === after) { failed++; lastFail = `${p.key}: state unchanged after click (${p.label}, money ${p.money.toFixed(0)}, cost ${p.cost.toFixed(0)})`; console.log('FAIL  no effect', lastFail); await page.evaluate(w => window.__core.simulate(window.__app.state, 5), 0); continue; }
-  ok++; kinds[p.kind] = (kinds[p.kind] || 0) + 1;
+  if (before === after) { failed++; consecutiveFails++; if (consecutiveFails >= 8) break; lastFail = `${p.key}: state unchanged after click (${p.label}, money ${p.money.toFixed(0)}, cost ${p.cost.toFixed(0)})`; console.log('FAIL  no effect', lastFail); await page.evaluate(w => window.__core.simulate(window.__app.state, 5), 0); continue; }
+  consecutiveFails = 0; ok++; kinds[p.kind] = (kinds[p.kind] || 0) + 1;
   if (steps % 40 === 0) { const st = await page.evaluate(() => { const s = window.__app.state; return { t: (s.rt.time / 3600).toFixed(2) + 'h', areas: s.areasOwned.length, lines: s.lines.length, maxTier: Math.max(...s.lines.map(l => l.tier)) }; }); console.log('progress', steps, JSON.stringify(st), JSON.stringify(kinds)); }
 }
 const end = await page.evaluate(() => { const s = window.__app.state; return { hours: (s.rt.time / 3600).toFixed(1), areas: s.areasOwned.length, lines: s.lines.length, maxTier: Math.max(...s.lines.map(l => l.tier)), buildings: Object.values(s.buildings).filter(x => x > 0).length, zones: Object.values(s.zones).filter(z => z.owned).length, quests: s.quests.claimedIds.length }; });
