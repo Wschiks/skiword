@@ -41,3 +41,8 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 
 ### M8 Native
 - Capacitor 8 projects for Android and iOS (SPM). AdMob (test ids, `LIVE=false`), native purchases, haptics, splash, status bar wired behind the existing services. Icons/splash generated from code (`npm run icons`). `cap sync` works. **Not compiled on this machine** (no Xcode / Android SDK), see `docs/native.md`.
+
+### Branch option/night-theme
+- Night look built from three cheap layers instead of a second art set: a MULTIPLY tint rectangle over the whole world (`NIGHT_TINT` in `src/config/theme.ts`), a stars + moon canvas above the tint (stars only outside the mountain silhouette), and additive glows for stations, buildings, lodge and parking lamps (new `glow` atlas frame, `src/scene/night.ts`). Dark UI via a `.night` class on `#app` (CSS variable overrides + a few explicit rules).
+- `?theme=day` / `?theme=night` overrides the default (night on this branch). Bug found on the way: text colour was inherited from `body`, so the HUD was dark on dark until `.night { color }` was set.
+- Screenshots: `screenshots/option-night-theme`.

@@ -196,3 +196,32 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #rotate { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; text-align: center; background: #24476b; color: #fff; font-weight: 700; padding: 24px; gap: 12px; flex-direction: column; }
 #rotate small { font-weight: 500; opacity: .8; }
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { #rotate { display: flex; } }
+
+/* ------------------------------------------------------------ night theme (option/night-theme) */
+.night { color: #EAF2FB; --snow: #1B2A42; --ice: #2C4160; --shadow: #0F1A2C; --panel: #14213AEE; --text: #EAF2FB; background: #0b1633; }
+.night #topbar, .night #tabs, .night .qchip, .night .next { border-color: #0F1A2C; }
+.night .card, .night .hintline, .night .modal-card { background: #23354F; color: var(--text); box-shadow: 0 1px 0 #0F1A2C; }
+.night .sub, .night .qdesc, .night .tb-rate, .night .note, .night .foot, .night .modal-body, .night .qrew, .night .stats, .night .qbox, .night .next-c, .night .lockline { color: #A9BBD0; }
+.night .stats b, .night .qbox b, .night .qr { color: #F2F7FC; }
+.night .muted { color: #93A8BF; }
+.night .btn.ghost { background: #31486A; color: #fff; }
+.night .btn.off, .night .btn.gold.off { background: #4B5F7D; color: #C6D3E3; }
+.night .chip { background: #31486A; color: #DCE8F5; } .night .chip.on { background: var(--accent2); color: #fff; }
+.night .qbox, .night .pill, .night .ico, .night .stage, .night .icon-btn, .night .badge { background: #2C4160; color: #DCE8F5; }
+.night .ico { color: #7DB8FF; } .night .ico.tier-chair { color: #6FD3A0; } .night .ico.tier-gondola { color: #C7A2FF; }
+.night #sheet { background: #1B2A42; box-shadow: 0 -4px 24px rgba(0,0,0,.5); }
+.night .grab i { background: #3A5175; }
+.night .tab { color: #9FB3C8; } .night .tab.on { color: #FF8A5F; }
+.night .dots i, .night .bar { background: #31486A; }
+.night .maxed { background: #1E4A38; color: #7FE0B0; }
+.night .qchip.done { background: #4A3E12; } .night .qchip.done .qrew { color: #F6D36B; }
+.night .stage.on { background: #21406C; color: #9CC8FF; } .night .stage.done { background: #1E4A38; }
+.night .qbox.hot { background: #5A2A2A; } .night .qbox.hot b { color: #FF8A8A; }
+.night .switch { background: #4B5F7D; } .night .switch.on { background: #2E9E68; }
+.night .card.next { outline-color: var(--accent); }
+.night .hintline .ic { color: #7DB8FF; }
+.night .sheet-title, .night .title, .night .group-h { color: #F2F7FC; }
+.night .group-h { color: #A9BBD0; }
+.night .badge.owned { background: #1E4A38; color: #7FE0B0; } .night .badge.next { background: #5A3320; color: #FF9A6B; }
+.night .tb-rate { color: #A9BBD0; }
+.night .modal-title, .night .big-num { color: #F2F7FC; }

@@ -9,11 +9,13 @@ import { setSoundEnabled, setHapticsEnabled } from './ui/sound';
 import { initAds } from './ads';
 import { initPurchases } from './purchases';
 import { AUTOSAVE_INTERVAL } from './config/balance';
+import { currentTheme } from './config/theme';
 
 const params = new URLSearchParams(location.search);
 app.debug = params.has('debug');
 app.state = (params.has('new') ? null : loadState()) ?? newGame(Math.floor(Math.random() * 1e9));
 
+if (currentTheme() === 'night') document.getElementById('app')!.classList.add('night');
 const host = document.getElementById('game')!;
 const game = new Phaser.Game({
   type: Phaser.WEBGL,

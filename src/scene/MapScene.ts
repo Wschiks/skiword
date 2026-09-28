@@ -13,6 +13,8 @@ import { ZoneView } from './zoneView';
 import { BusView, VillageView } from './busView';
 import { Fx } from './fx';
 import { formatMoney } from '../ui/format';
+import { currentTheme } from '../config/theme';
+import { NightLayer } from './night';
 
 export type MapHit =
   | { type: 'line'; id: string } | { type: 'slot'; areaId: string; slot: number }
@@ -32,6 +34,7 @@ export class MapScene extends Phaser.Scene {
   private syncT = 0;
   private dprV = 1;
   private hilite?: Phaser.GameObjects.Image;
+  private night: NightLayer | null = null;
 
   constructor() { super('map'); }
 
@@ -53,6 +56,7 @@ export class MapScene extends Phaser.Scene {
     this.fx = new Fx(this);
     this.locks = this.add.graphics().setDepth(5200);
     this.makeAreaLabels();
+    if (currentTheme() === 'night') this.night = new NightLayer(this);
 
     const host = document.getElementById('game')!;
     this.mv = new MapView(host);
@@ -61,7 +65,7 @@ export class MapScene extends Phaser.Scene {
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
     this.onResize();
-    this.cameras.main.setBackgroundColor('#8FC4E8');
+    if (!this.night) this.cameras.main.setBackgroundColor('#8FC4E8');
     app.emit('sceneReady', this);
   }
 
@@ -139,6 +143,7 @@ export class MapScene extends Phaser.Scene {
     this.zones.update(s, time, zoomRel);
     this.village.update(s, parkingCapacity(s), zoomRel);
     this.bus.update(s);
+    this.night?.update(s, time);
     // events
     const ev = s.rt.events;
     for (const e of ev) {

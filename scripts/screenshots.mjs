@@ -9,7 +9,7 @@ const want = name => only.length === 0 || only.includes(name);
 const server = await startServer();
 let exit = 0;
 try {
-  const { browser, page, errors } = await openPage(server.url + '?new&debug');
+  const { browser, page, errors } = await openPage(server.url + '?new&debug' + (process.env.THEME ? '&theme=' + process.env.THEME : ''));
   const cam = (x, y, z) => page.evaluate(([x, y, z]) => window.__game.scene.getScene('map').mv.focus(x, y, z), [x, y, z]);
   const setup = fn => page.evaluate(fn);
   await wait(page, 1500);

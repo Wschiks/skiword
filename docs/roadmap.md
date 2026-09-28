@@ -25,4 +25,4 @@ Skill trees, resort reputation, weather, extra sports, cloud saves, leaderboards
 | Branch | What it changes |
 |---|---|
 | `option/fast-balance` | roughly 3x faster progression (about 25 h to everything maxed) for a more casual pace |
-| `option/night-theme` | evening / night look for the map and a dark UI theme |
+| `option/night-theme` | (this branch) evening look: tint, stars + moon, glowing windows and lamps, dark UI; `?theme=day` switches back |
