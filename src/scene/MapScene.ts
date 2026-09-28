@@ -62,6 +62,10 @@ export class MapScene extends Phaser.Scene {
     window.visualViewport?.addEventListener('resize', resize);
     this.onResize();
     this.cameras.main.setBackgroundColor('#8FC4E8');
+    app.on('focus', (f: { x: number; y: number; pan?: boolean; zoom?: number; burst?: number; yFrac?: number }) => {
+      if (f.pan) this.mv.panTo(f.x, f.y, f.zoom, f.yFrac ?? 0.5);
+      if (f.burst) this.fx.burst(f.x, f.y, f.burst);
+    });
     app.emit('sceneReady', this);
   }
 

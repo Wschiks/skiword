@@ -67,13 +67,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 #dock { position: absolute; left: 10px; right: 10px; bottom: calc(60px + var(--safe-bottom) + 8px); display: flex; gap: 8px; align-items: flex-end; justify-content: space-between; pointer-events: none; }
 .sheet-open #dock { display: none; }
-.next { pointer-events: auto; flex: 1 1 auto; max-width: 68%; text-align: left; border: 0; background: var(--panel); border-radius: 14px; padding: 7px 10px 8px; box-shadow: 0 2px 8px rgba(30,60,90,.22); backdrop-filter: blur(6px); }
-.next-t { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
-.next-l { font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); font-weight: 800; }
-.next-n { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.next-c { font-size: 11px; color: #5B6B7C; font-weight: 700; }
-.next .bar { margin-top: 5px; }
-.next .bar.ready i { background: #4CC38A; }
+.nextpill { pointer-events: auto; flex: 1 1 auto; max-width: 68%; text-align: left; border: 0; background: var(--panel); border-radius: 14px; padding: 7px 10px 8px; box-shadow: 0 2px 8px rgba(30,60,90,.22); backdrop-filter: blur(6px); }
+.nextpill .next-t { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.nextpill .next-l { font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); font-weight: 800; }
+.nextpill .next-n { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nextpill .next-c { font-size: 11px; color: #5B6B7C; font-weight: 700; }
+.nextpill .bar { margin-top: 5px; }
+.nextpill .bar.ready i { background: #4CC38A; }
 .busfab { white-space: nowrap; pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--gold); color: #3a2a00; font-weight: 800; padding: 0 14px; height: 48px; border-radius: 999px; box-shadow: 0 3px 0 rgba(0,0,0,.2), 0 4px 12px rgba(0,0,0,.2); animation: donepulse 1.4s infinite; }
 
 #tabs { position: absolute; left: 0; right: 0; bottom: 0; height: calc(60px + var(--safe-bottom)); padding-bottom: var(--safe-bottom);
@@ -196,3 +196,5 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #rotate { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; text-align: center; background: #24476b; color: #fff; font-weight: 700; padding: 24px; gap: 12px; flex-direction: column; }
 #rotate small { font-weight: 500; opacity: .8; }
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { #rotate { display: flex; } }
+
+.stats.wide { grid-template-columns: repeat(2, 1fr); gap: 8px 6px; margin-top: 10px; }

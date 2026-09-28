@@ -12,3 +12,4 @@ If you spot something in an early folder that was later removed or changed, the 
 | `options/` | (branches) | Preview shots of the alternative branches: `night-theme-*` from `option/night-theme` (full sets live in that branch under `screenshots/option-night-theme`) |
 | `m7-viewports*` | `m7-m8-polish-native` | Small phone, Android, tablet and desktop widths. `-before` is the stretched desktop layout that was fixed by the phone-width column |
 | `m7-art-tour` | `m7-m8-polish-native` | Close-up of every zone, building, the park's 3 stages, lodge, parking and the ski bus with everything unlocked. Found the zone/lift overlap and the horizontal-pan bug |
+| `m7-focus` | (next commit) | Buying a new area: sheet closes, camera glides to the new territory, ring + glow burst and "Unlocked" toast (`buy-area-burst`, `buy-area-after-glide`) |
