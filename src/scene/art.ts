@@ -161,8 +161,6 @@ function chalet(c: CanvasRenderingContext2D, w: number, h: number, wall: string,
   fillRR(c, w / 2 - 3.5, h - 11, 7, 11, 1.5, '#5A3E2B');
 }
 
-const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
-void clamp;
 
 export function bakeAll(scene: Phaser.Scene) {
   const atlas = new Atlas(scene);

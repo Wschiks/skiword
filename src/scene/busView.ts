@@ -24,11 +24,10 @@ export class BusView {
 
 export class VillageView {
   private cars: Phaser.GameObjects.Image[] = [];
-  private lodge: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
   private shown = 0;
-  constructor(private scene: Phaser.Scene) {
-    this.lodge = scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, ATLAS, 'lodge').setOrigin(0.5, 1).setScale(1 / S).setDepth(LODGE_POS.y + 12);
+  constructor(scene: Phaser.Scene) {
+    scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, ATLAS, 'lodge').setOrigin(0.5, 1).setScale(1 / S).setDepth(LODGE_POS.y + 12);
     for (let i = 0; i < 60; i++) {
       const col = i % 10, row = Math.floor(i / 10);
       const x = PARKING_POS.x - 126 + 14 + col * 28, y = PARKING_POS.y - 112 + 20 + row * 25;

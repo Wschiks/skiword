@@ -7,7 +7,7 @@ import { areaOwned, lineById, makeLine } from './state';
 import type { GameState } from './state';
 import {
   areaCost, buildingCost, buildingUpgradeCost, housingCost, levelUpgradeCost, newLineCost, parkingCost,
-  tierBuildCost, tierDef, zoneBuyCost, zoneDef, zoneUpgradeCost, parkingCapacityAt, housingCapacityAt, bottleneck,
+  tierBuildCost, tierDef, zoneBuyCost, zoneDef, zoneUpgradeCost, bottleneck,
 } from './economy';
 
 export type Result = { ok: true; n?: number } | { ok: false; reason: string };
@@ -225,4 +225,3 @@ export function nextGoal(s: GameState): { label: string; cost: number; kind: Pur
   const p = cands[0];
   return { label: p.label, cost: p.cost, kind: p.kind };
 }
-void parkingCapacityAt; void housingCapacityAt;

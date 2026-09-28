@@ -3,7 +3,6 @@ import type { QuestCond, QuestDef } from '../config/quests';
 import { areaOwned, parkStage } from './state';
 import type { GameState } from './state';
 import { areaCost, estimateIncomePerSecond, housingCapacity, parkingCapacity } from './economy';
-import { GEMS } from '../config/balance';
 import type { Result } from './unlocks';
 
 export function condProgress(s: GameState, c: QuestCond): { cur: number; target: number } {
@@ -69,5 +68,4 @@ export function tutorialTick(s: GameState) {
   if (t.step === 4 && maxTier >= 2) t.step = 5;
   if (t.step === 5 && (s.stats.angryLeaves >= 1 || s.money >= areaCost('lower'))) t.step = 6;
   if (t.step === 6 && areaOwned(s, 'lower')) { t.step = 7; t.done = true; }
-  void GEMS;
 }

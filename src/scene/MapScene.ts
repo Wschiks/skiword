@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { AREAS } from '../config/areas';
-import { WORLD, hub, slotBase, slotTop } from '../config/layout';
+import { WORLD, slotBase, slotTop } from '../config/layout';
 import { app } from '../app';
 import { advance, areaCost, parkingCapacity } from '../core/game';
 import { ATLAS, bakeAll, S } from './art';
@@ -25,7 +25,6 @@ export class MapScene extends Phaser.Scene {
   private bus!: BusView; private village!: VillageView; private fx!: Fx;
   private pistes!: PisteLayer;
   private locks!: Phaser.GameObjects.Graphics;
-  private lockObjs: Phaser.GameObjects.GameObject[] = [];
   private areaLabels: Phaser.GameObjects.Text[] = [];
   private priceLabels = new Map<string, Phaser.GameObjects.Text>();
   private signs = new Map<string, Phaser.GameObjects.Image>();
@@ -69,6 +68,7 @@ export class MapScene extends Phaser.Scene {
   private onResize() {
     const host = document.getElementById('game')!;
     const w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
+    if (!(w >= 50 && h >= 50)) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     this.dprV = dpr;
     this.scale.setZoom(1 / dpr);
@@ -86,7 +86,6 @@ export class MapScene extends Phaser.Scene {
       this.signs.set(a.id, sign);
       const p = this.add.text(600, (a.band[0] + a.band[1]) / 2 + 95, '', { fontFamily: 'system-ui, sans-serif', fontSize: '46px', fontStyle: 'bold', color: '#ffffff', stroke: '#26384d', strokeThickness: 8 }).setOrigin(0.5).setDepth(5301).setVisible(false);
       this.priceLabels.set(a.id, p);
-      void i;
     });
   }
 
@@ -116,8 +115,7 @@ export class MapScene extends Phaser.Scene {
         for (let y = y0; y <= y1; y += 40) pts.push(new Phaser.Math.Vector2(edgeL(y) + 24, y));
         for (let y = y1; y >= y0; y -= 40) pts.push(new Phaser.Math.Vector2(WORLD.w - edgeL(y) - 24, y));
         this.locks.fillPoints(pts, true);
-        void i;
-      });
+        });
     }
   }
 
@@ -179,4 +177,3 @@ export class MapScene extends Phaser.Scene {
     this.hilite.setVisible(true).setPosition(x, y).setScale(size / 32 / S * 2 * (1 + Math.sin(this.time.now / 200) * 0.08));
   }
 }
-void hub;

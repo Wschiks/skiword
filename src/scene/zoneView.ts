@@ -8,7 +8,7 @@ export class ZoneView {
   private imgs = new Map<string, Phaser.GameObjects.Image>();
   private plots = new Map<string, Phaser.GameObjects.Image>();
   private labels = new Map<string, Phaser.GameObjects.Text>();
-  constructor(private scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene) {
     for (const z of ZONES) {
       const key = z.id === 'park' ? 'zone_park1' : `zone_${z.id}`;
       const im = scene.add.image(z.pos.x, z.pos.y, ATLAS, key).setOrigin(0, 1).setScale(1.5 / S).setDepth(z.pos.y).setVisible(false);

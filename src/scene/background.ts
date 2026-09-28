@@ -80,10 +80,8 @@ export function bakeBackground(scene: Phaser.Scene) {
     c.restore();
     // area ridge lines (shadow + snow lip)
     for (let i = 1; i < AREAS.length; i++) {
-      const y = AREAS[i].band[1] - 0; // bottom of area i = top of area i-1
       if (i === 4) continue;
       const yy = AREAS[i - 1].band[0];
-      void y;
       c.save(); outline(26, 30, 11); c.clip();
       const g = c.createLinearGradient(0, yy - 6, 0, yy + 22);
       g.addColorStop(0, 'rgba(90,110,135,0.38)'); g.addColorStop(1, 'rgba(90,110,135,0)');

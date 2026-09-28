@@ -131,7 +131,6 @@ export class LiftView {
     if (this.bridgeCabin) this.bridgeCabin.x = 600 + Math.sin(now / 9) * 400;
     const pulse = 1 + Math.sin(time * 3) * 0.08;
     for (const p of this.plus) p.img.setScale(1.9 / S * pulse);
-    void S;
   }
 
   hit(wx: number, wy: number): { type: 'line'; id: string } | { type: 'slot'; areaId: string; slot: number } | null {

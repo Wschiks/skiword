@@ -152,17 +152,15 @@ export function bottleneck(s: GameState): 'lifts' | 'people' | 'balanced' {
 export function bottleneckHint(s: GameState): string {
   const rt = s.rt;
   const recentAngry = s.stats.angryRecent.filter(t => rt.time - t <= 60).length;
-  let fill = 0, cnt = 0, util = 0, sTot = 0;
+  let fill = 0, cnt = 0, sTot = 0;
   for (const l of s.lines) {
     fill += l.queue.length / queueCap(l); cnt++;
-    sTot += throughput(l); util += l.incomeRate > 0 ? 1 : 0;
+    sTot += throughput(l);
   }
   const avgFill = cnt ? fill / cnt : 0;
   if (recentAngry >= 2 || avgFill > 0.6) return 'Queues are long. Upgrade your lifts.';
-  const riding = rt.guests.filter(g => g.state === 'riding').length;
   const boardedPerSec = s.lines.reduce((a, l) => a + l.departures.filter(d => rt.time - d.t0 <= 10).reduce((x, d) => x + d.n, 0), 0) / 10;
   const utilisation = sTot > 0 ? boardedPerSec / sTot : 0;
-  void riding; void util;
   if (rt.time > 20 && utilisation < 0.5) {
     return rt.guests.length < maxPop(s) ? 'Lifts are idle. Wait for guests or add parking.' : 'Lifts are idle. Add parking or housing.';
   }

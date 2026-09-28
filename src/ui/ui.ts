@@ -1,13 +1,11 @@
 import { app } from '../app';
-import { OFFLINE, GEMS } from '../config/balance';
+import { OFFLINE } from '../config/balance';
 import { AREAS, areaDef } from '../config/areas';
-import { BUILDINGS } from '../config/facilities';
-import { ZONES } from '../config/zones';
 import { PRODUCTS } from '../config/shop';
 import { QUESTS } from '../config/quests';
 import {
   bottleneck, bottleneckHint, buyCashBundle, busStatus, callSkiBus, canNewSeason, claimOffline, claimQuest, computeOffline, isDone,
-  listPurchases, maxPop, nextGoal, seasonPreview, startNewSeason, queueCap, areaOwned,
+  listPurchases, maxPop, nextGoal, seasonPreview, startNewSeason, queueCap,
 } from '../core/game';
 import { clearSave, saveState } from '../core/save';
 import { ads } from '../ads';
@@ -380,14 +378,12 @@ function tick(force = false) {
     if (t && (t.target === 'upgrade' || t.target === 'rebuild') && s.lines[0]) {
       const ai = AREAS.findIndex(a => a.id === s.lines[0].areaId);
       const b = AREAS[ai];
-      const sl = b.slots.length; void sl;
       scene.ring((1200 * (s.lines[0].slot + 1)) / (b.slots.length + 1), b.band[1] - 40, 80);
     } else scene.ring(null);
   }
 }
 
 function renderAll(immediate: boolean) {
-  void immediate;
   const s = app.state;
   // quests strip
   setHTML($('quests'), renderQuests(s));
@@ -428,6 +424,4 @@ function renderAll(immediate: boolean) {
       if (el) { (el as HTMLElement).scrollIntoView({ block: 'nearest' }); ctx.focus = null; }
     }
   }
-  // menu-btn highlight
-  void GEMS; void BUILDINGS; void ZONES; void areaOwned;
 }

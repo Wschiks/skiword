@@ -5,9 +5,9 @@
   --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); color: var(--text);
+html, body { margin: 0; height: 100%; overflow: hidden; background: radial-gradient(circle at 50% 20%, #5B9BD5, #24476b); color: var(--text);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
-#app { position: fixed; inset: 0; }
+#app { position: fixed; top: 0; bottom: 0; left: 50%; width: min(100vw, 500px); margin-left: calc(min(100vw, 500px) / -2); overflow: hidden; background: var(--sky); box-shadow: 0 0 60px rgba(0,0,0,.4); }
 #game { position: absolute; inset: 0; }
 #game canvas { display: block; }
 #ui { position: absolute; inset: 0; pointer-events: none; }
@@ -192,3 +192,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent2); outline-offset: 2px; }
 .btn.off { background: #8FA0B0; }
 .tb-rate { color: #46566A; }
+
+#rotate { position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center; text-align: center; background: #24476b; color: #fff; font-weight: 700; padding: 24px; gap: 12px; flex-direction: column; }
+#rotate small { font-weight: 500; opacity: .8; }
+@media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { #rotate { display: flex; } }

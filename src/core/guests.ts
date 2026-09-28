@@ -24,6 +24,8 @@ export const rndInt = (s: GameState, lo: number, hi: number) => lo + Math.floor(
 // ---------- helpers ----------
 const homeWalk = (area: number) => WALK.homeBase + WALK.homePerArea * area;
 const hubWalk = (a: number, b: number) => WALK.hubStep * Math.abs(a - b);
+/** each guest lands on their own spot around the hub so skiers fan out instead of stacking in one column */
+const hubSpot = (g: Guest, area: number): Pt => { const h = hub(area); return { x: h.x + ((g.id * 37) % 200) - 100, y: h.y + ((g.id * 53) % 22) - 4 }; };
 const homePos = (g: Guest): Pt => (g.home === 'day' ? PARKING_POS : g.home === 'bus' ? BUS_STOP : LODGE_POS);
 
 function move(g: Guest, to: Pt, dur: number, state: GuestState) {
@@ -45,8 +47,9 @@ export function makeGuest(s: GameState, home: GuestHome, at: Pt, kind?: 'ski' | 
     patience: GUEST.patience * (1 - GUEST.patienceJitter + rnd(s) * 2 * GUEST.patienceJitter),
     ridesDone: 0, ridesTarget: rides, sessionsLeft: home === 'lodge' ? GUEST.lodgeSessions : 0,
     zoneSinceRide: false, angry: false,
-    x: at.x, y: at.y, from: { ...at }, to: hub(0), qi: 0, color: rndInt(s, 0, 5), retry: 0, done: false,
+    x: at.x, y: at.y, from: { ...at }, to: { x: 0, y: 0 }, qi: 0, color: rndInt(s, 0, 5), retry: 0, done: false,
   };
+  g.to = hubSpot(g, 0);
   rt.guests.push(g);
   return g;
 }
@@ -205,7 +208,7 @@ export function guestTick(s: GameState, g: Guest, dt: number) {
   switch (g.state) {
     case 'arriving':
       g.timer -= dt;
-      if (g.timer <= 0) { g.x = hub(0).x; g.y = hub(0).y; g.area = 0; pickLift(s, g); }
+      if (g.timer <= 0) { g.x = g.to.x; g.y = g.to.y; g.area = 0; pickLift(s, g); }
       break;
     case 'walkingToLift': {
       g.timer -= dt;
@@ -246,7 +249,7 @@ export function guestTick(s: GameState, g: Guest, dt: number) {
         g.ridesDone++;
         s.stats.ridesTotal++;
         g.x = lineTop(line).x; g.y = lineTop(line).y;
-        move(g, hub(a), skiTime(a) * (GUEST.skiJitter[0] + rnd(s) * (GUEST.skiJitter[1] - GUEST.skiJitter[0])), 'skiing');
+        move(g, hubSpot(g, a), skiTime(a) * (GUEST.skiJitter[0] + rnd(s) * (GUEST.skiJitter[1] - GUEST.skiJitter[0])), 'skiing');
       }
       break;
     }
@@ -290,7 +293,7 @@ export function guestTick(s: GameState, g: Guest, dt: number) {
         g.ridesTarget = rndInt(s, GUEST.lodgeRides[0], GUEST.lodgeRides[1]);
         g.zoneSinceRide = false;
         g.area = 0;
-        move(g, hub(0), WALK.arrive, 'arriving');
+        move(g, hubSpot(g, 0), WALK.arrive, 'arriving');
       }
       break;
     case 'leaving':

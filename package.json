@@ -13,6 +13,8 @@
     "screenshots": "node scripts/screenshots.mjs",
     "smoke": "node scripts/smoke.mjs",
     "flows": "node scripts/flows.mjs",
+    "perf": "node scripts/perf.mjs",
+    "soak": "tsx scripts/soak.ts",
     "legal": "tsx scripts/make-legal.ts",
     "tune": "tsx scripts/tune.ts",
     "icons": "node scripts/make-icons.mjs && npx @capacitor/assets generate --android --ios --iconBackgroundColor #8FC4E8 --splashBackgroundColor #8FC4E8",

@@ -12,6 +12,7 @@ export class MapView {
   private downAt = { x: 0, y: 0, t: 0 };
   private moved = 0;
   fit = 0.33;
+  private inited = false;
   onTap: (wx: number, wy: number) => void = () => {};
 
   constructor(private el: HTMLElement) {
@@ -24,11 +25,13 @@ export class MapView {
   }
 
   resize(w: number, h: number, dpr: number) {
-    const first = this.w === 390 && this.h === 844 && this.zoom === 0.33;
+    // a hidden pane / webview can report 0x0 during startup; keep the old layout until a real size arrives
+    if (!(w >= 50 && h >= 50) || !Number.isFinite(dpr)) return;
     const oldFit = this.fit;
     this.w = w; this.h = h; this.dpr = dpr;
     this.fit = w / WORLD.w;
-    if (first) { this.zoom = this.fit; this.cy = 1e6; } else this.zoom *= this.fit / oldFit;
+    if (!this.inited) { this.inited = true; this.zoom = this.fit; this.cy = 1e6; }
+    else this.zoom *= this.fit / oldFit;
     this.clamp();
   }
 
@@ -37,6 +40,9 @@ export class MapView {
   }
 
   private clamp() {
+    if (!Number.isFinite(this.zoom) || this.zoom <= 0) this.zoom = this.fit;
+    if (!Number.isFinite(this.cx)) this.cx = WORLD.w / 2;
+    if (!Number.isFinite(this.cy)) this.cy = 1e6;
     const min = this.fit * ZOOM.minFactor, max = this.fit * ZOOM.maxFactor;
     this.zoom = Math.min(max, Math.max(min, this.zoom));
     const hw = this.w / (2 * this.zoom), hh = this.h / (2 * this.zoom);

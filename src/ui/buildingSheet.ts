@@ -4,7 +4,7 @@ import type { Count } from '../core/unlocks';
 import { areaOwned, buildingCost, buildingIncomeRate, buildingUpgradeCost, buyBuilding, incomeMult, maxPop, upgradeBuilding } from '../core/game';
 import type { Ctx } from './types';
 import { icons } from './icons';
-import { formatMoney, formatRate } from './format';
+import { formatRate } from './format';
 import { btn, bulkInfo, dots } from './util';
 
 export function render(c: Ctx): string {
@@ -25,7 +25,6 @@ export function render(c: Ctx): string {
     }
     html += `</div>`;
   }
-  void formatMoney;
   return html;
 }
 

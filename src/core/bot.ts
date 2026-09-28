@@ -69,7 +69,6 @@ function scoreOne(s: GameState, base: number, p: Purchase): Scored {
   }
   if (p.kind === 'area') {
     // bundle with the cheapest useful follow-up that the new area unlocks (line, building, zone or housing)
-    const id = p.key.split(':')[1];
     const before = new Set(listPurchases(s).map(q => q.key));
     const follow = listPurchases(c).filter(q => !before.has(q.key) && (q.kind === 'newline' || q.kind === 'building' || q.kind === 'zone' || q.kind === 'housing'));
     let best: { payback: number; cost: number; delta: number } | null = null;
@@ -83,7 +82,6 @@ function scoreOne(s: GameState, base: number, p: Purchase): Scored {
         if (!best || pb < best.payback) best = { payback: pb, cost: p.cost + f.cost, delta: d };
       }
     }
-    void id;
     if (best) { delta = best.delta; cost = best.cost; } else delta = Math.max(delta, base * 0.02);
     return { p, cost: p.cost, delta, payback: cost / Math.max(delta, 1e-9) };
   }

@@ -8,7 +8,7 @@ export class BuildingView {
   private imgs = new Map<string, Phaser.GameObjects.Image>();
   private plots = new Map<string, Phaser.GameObjects.Image>();
   private labels = new Map<string, Phaser.GameObjects.Text>();
-  constructor(private scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene) {
     for (const b of BUILDINGS) {
       const im = scene.add.image(b.pos.x, b.pos.y, ATLAS, `bld_${b.id}`).setOrigin(0.5, 1).setScale(1.6 / S).setDepth(b.pos.y).setVisible(false);
       this.imgs.set(b.id, im);

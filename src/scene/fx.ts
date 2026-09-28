@@ -11,7 +11,7 @@ export class Fx {
   private agg = 0; private aggPos = { x: 0, y: 0 }; private aggTimer = 0;
   private flakes: { img: Phaser.GameObjects.Image; x: number; y: number; v: number; sw: number; ph: number }[] = [];
 
-  constructor(private scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene) {
     for (let i = 0; i < 32; i++) {
       const t = scene.add.text(0, 0, '', { fontFamily: 'system-ui, sans-serif', fontSize: '26px', fontStyle: 'bold', color: '#1f8a4c', stroke: '#ffffff', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(6000).setVisible(false);
       this.floats.push({ text: t, t: 0, x: 0, y: 0, on: false });

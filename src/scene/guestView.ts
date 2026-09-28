@@ -1,15 +1,11 @@
 import Phaser from 'phaser';
 import { ZONES } from '../config/zones';
-import { BUILDINGS } from '../config/facilities';
-import { LODGE_POS, hub } from '../config/layout';
 import { ATLAS, S, guestKey } from './art';
 import { SKI_SWAY, pisteCurve } from './background';
 import type { GameState, Guest } from '../core/game';
-import { areaIndex } from '../config/areas';
 import { lineBase } from '../core/lifts';
 
 const zonePos = (id: string) => ZONES.find(z => z.id === id)!.pos;
-void BUILDINGS;
 
 export interface Pos { x: number; y: number; visible: boolean; moving: boolean; dir: number }
 
@@ -42,11 +38,9 @@ export function guestPos(s: GameState, g: Guest, out: Pos): Pos {
       out.y = b.y + 20 + Math.floor(g.qi / 5) * 14;
       break;
     }
-    case 'lobby': {
-      const h = hub(g.area);
-      out.x = h.x + ((g.id * 37) % 200) - 100; out.y = h.y + ((g.id * 53) % 22) - 4;
+    case 'lobby':
+      out.x = g.x; out.y = g.y;
       break;
-    }
     case 'inZone': {
       const p = zonePos(g.zoneId!);
       out.x = p.x + (((g.id * 29) % 120) - 55); out.y = p.y + 14 + ((g.id * 17) % 26);
@@ -61,7 +55,6 @@ export function guestPos(s: GameState, g: Guest, out: Pos): Pos {
     default:
       out.visible = false; // riding, resting, choosing
   }
-  void LODGE_POS; void areaIndex;
   return out;
 }
 
