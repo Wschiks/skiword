@@ -27,13 +27,20 @@ export const AUTOSAVE_INTERVAL = 10;
  * `tier` has one entry per lift tier (1..10) and `area` one entry per area (bunny..glacier).
  */
 /**
- * FAST variant: the opening keeps close to main's pace (a new player should still feel each early purchase),
- * the mid and late game are compressed harder. Everything maxed in about a day instead of about three.
+ * FAST variant of main's tuned costs: the opening keeps close to main's pace (a new player should still feel each
+ * early purchase), the mid and late game are compressed harder. Everything maxed in about a day instead of about three.
+ * The numbers inside MAIN are main's optimiser result; the factors below are this branch's compression.
  */
+const MAIN = {
+  parking: 1.64, housing: 1, slot: 1.19, building: 0.353, zone: 0.371,
+  liftLevel: [1, 1, 1, 1, 1, 1, 0.178, 0.531, 0.183, 0.582] as number[],
+  tier: [1, 1.36, 4.86, 7.66, 5.26, 8.42, 5.24, 4.84, 2.96, 3.99] as number[],
+  area: [1, 0.402, 1.21, 1.17, 2.49] as number[],
+};
 const mul = (xs: number[], ks: number[]) => xs.map((x, i) => Number((x * ks[i]).toPrecision(3)));
 export const TUNE = {
-  parking: 1.39 * 0.8, housing: 1 * 0.5, slot: 1 * 0.5, building: 0.226 * 0.5, zone: 1 * 0.4,
-  liftLevel: mul([1, 1, 1, 1, 1, 1, 0.35, 0.35, 0.35, 0.35], [0.8, 0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
-  tier: mul([1, 1.18, 3.98, 4.18, 4.4, 4.74, 5.5, 4.4, 4.4, 4.6], [1, 0.9, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
-  area: mul([1, 0.33, 0.4, 1.5, 1.4], [1, 0.9, 0.6, 0.4, 0.3]),
+  parking: MAIN.parking * 0.8, housing: MAIN.housing * 0.5, slot: MAIN.slot * 0.5, building: MAIN.building * 0.5, zone: MAIN.zone * 0.4,
+  liftLevel: mul(MAIN.liftLevel, [0.8, 0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
+  tier: mul(MAIN.tier, [1, 0.9, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
+  area: mul(MAIN.area, [1, 0.9, 0.6, 0.4, 0.3]),
 };

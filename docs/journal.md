@@ -42,5 +42,15 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 ### M8 Native
 - Capacitor 8 projects for Android and iOS (SPM). AdMob (test ids, `LIVE=false`), native purchases, haptics, splash, status bar wired behind the existing services. Icons/splash generated from code (`npm run icons`). `cap sync` works. **Not compiled on this machine** (no Xcode / Android SDK), see `docs/native.md`.
 
+### Real-GPU check and close-up review (after M8)
+- Used the built-in browser (Apple M2 Pro GPU, ANGLE Metal): 60 fps with 189 guests. Also found a startup bug there: the pane reported a 0x0 viewport at first, the camera zoom became NaN and the map never rendered. Software-GL headless never hit it. Fixed by ignoring sizes under 50 px and repairing non-finite camera state.
+- `scripts/touch.mjs` drives real multi-touch through the DevTools protocol (drag, pinch, tap, scroll-without-buying). It exposed that horizontal panning was impossible when zoomed in (a leftover clamp line). Fixed.
+- `scripts/art-tour.mjs` close-ups showed the zone props sitting on the lift cables. Zone coordinates moved (decisions.md). Also: skiers all landed on one spot at each hub (now spread), `formatNum(999.9T)` printed "1000T" (now "1.00Qa").
+- Phone-width column on desktop/tablet, rotate hint on landscape phones.
+
+### Balance pass 2 (all milestones in tolerance)
+- Two milestones were outside their band (Lower Slopes +147%, Mid Mountain -48%). Cause: the greedy bot never saves for an area while cheap upgrades still pay back, and its one-step estimate cannot see the buildings, zones and housing an area unlocks. Tried: a global unlock bonus (fixes Lower, breaks Peaks), per-area grids (interacting, fiddly), then wrote `scripts/optimize.ts` which found a solution in about 20 s. New numbers in `src/config/balance.ts` and `BOT.areaBonus`; full-simulation cross-check of the first 30 minutes agrees within about 25%.
+- Fixed a flaky test that measured a small cost against a 1e15 balance (float rounding).
+
 ### Branch option/fast-balance
-- Only `src/config/balance.ts` (TUNE), `tests/playthrough.test.ts` bounds and docs differ from main. First attempt was a uniform 0.3x scale, rejected: T-Bar after 34 s and chair after 2.6 min makes the opening a blur. Final profile scales early costs 0.8-1.0x and late costs 0.3x. Result: T-Bar 3.2 min, first chair 11 min, Mid Mountain 20 min, first gondola 2 h, Glacier 4.7 h, everything maxed 23.9 h.
+- Only `src/config/balance.ts` (TUNE), `tests/playthrough.test.ts` bounds and docs differ from main. The profile is main's tuned costs times compression factors: first attempt was a uniform 0.3x, rejected because T-Bar after 34 s and chair after 2.6 min makes the opening a blur. Final: early costs 0.8-1.0x, late costs 0.3x. After main's second balance pass the profile was re-derived from main's new numbers (`MAIN` block in `balance.ts`): T-Bar 3.8 min, first chair 14.5 min, Mid Mountain 57 min, first gondola 2.2 h, Glacier 5.2 h, everything maxed 25 h.

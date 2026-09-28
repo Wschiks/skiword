@@ -46,8 +46,6 @@ export class MapView {
     const min = this.fit * ZOOM.minFactor, max = this.fit * ZOOM.maxFactor;
     this.zoom = Math.min(max, Math.max(min, this.zoom));
     const hw = this.w / (2 * this.zoom), hh = this.h / (2 * this.zoom);
-    const mx = Math.max(0, hw - WORLD.w / 2);
-    this.cx = Math.min(WORLD.w / 2 + mx, Math.max(WORLD.w / 2 - mx, this.cx));
     if (hw * 2 >= WORLD.w) this.cx = WORLD.w / 2;
     else this.cx = Math.min(WORLD.w - hw, Math.max(hw, this.cx));
     const minCy = hh - this.padTop / this.zoom, maxCy = WORLD.h - hh + this.padBottom / this.zoom;

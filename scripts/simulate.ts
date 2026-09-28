@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { newGame } from '../src/core/game';
-import { runBot, MILESTONES } from '../src/core/bot';
+import { runBot, MILESTONES, BOT } from '../src/core/bot';
 import { TUNE } from '../src/config/balance';
 
 const args = process.argv.slice(2);
@@ -14,6 +14,8 @@ const fmt = (sec: number) => {
 
 const tuneArg = args.find(a => a.startsWith('--tune='));
 if (tuneArg) Object.assign(TUNE, JSON.parse(tuneArg.slice(7)));
+const botArg = args.find(a => a.startsWith('--areabonus='));
+if (botArg) BOT.areaBonus = botArg.split('=')[1].split(',').map(Number);
 const s = newGame(1);
 const t0 = Date.now();
 const res = runBot(s, { mode, maxSeconds: minutes > 0 ? minutes * 60 : undefined });
