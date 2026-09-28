@@ -13,6 +13,7 @@
     "screenshots": "node scripts/screenshots.mjs",
     "smoke": "node scripts/smoke.mjs",
     "flows": "node scripts/flows.mjs",
+    "touch": "node scripts/touch.mjs",
     "perf": "node scripts/perf.mjs",
     "soak": "tsx scripts/soak.ts",
     "legal": "tsx scripts/make-legal.ts",

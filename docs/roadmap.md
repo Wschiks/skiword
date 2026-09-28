@@ -11,7 +11,7 @@
 
 ## Not done / known gaps
 - Native apps were **not compiled or run on a device** (no Xcode / Android SDK on the build machine). `cap sync` works. See `docs/native.md`.
-- Balance: the greedy bot buys Lower Slopes later and Mid Mountain earlier than the design table (outside the +/-35% band); everything else is inside. Total to max is about 74 h against a 60 to 80 h target. See `docs/balance-report.md`. The design table is a bot's optimum, real players will differ, tuning with real play data is the next step.
+- Balance: all milestones are inside their bands for the balance bot (worst -21%, total to max 76 h vs a 60 to 80 h target, `docs/balance-report.md`). The bot is a payback optimiser, real players will differ: tuning with real play data is the next step. Optimiser: `npx tsx scripts/optimize.ts 150 --write`.
 - Audio is synthesized beeps (no music).
 - No real store products, no live ad units, publisher block in `src/config/legal.ts` still has placeholders.
 - Only one language (English), no localization layer.

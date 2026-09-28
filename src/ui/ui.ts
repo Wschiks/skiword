@@ -62,6 +62,8 @@ export function initUI() {
   app.on('sceneReady', (s: MapScene) => { scene = s; });
   app.on('mapTap', (h: MapHit) => onMapTap(h));
   app.on('event', onEvent);
+  // browsers only allow audio after a user gesture, and map taps never reach the UI root
+  document.addEventListener('pointerdown', () => initAudio(), { passive: true });
   setupPointer(root);
   setupSheetDrag();
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); else saveNow(); });

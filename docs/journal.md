@@ -46,3 +46,13 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 - Night look built from three cheap layers instead of a second art set: a MULTIPLY tint rectangle over the whole world (`NIGHT_TINT` in `src/config/theme.ts`), a stars + moon canvas above the tint (stars only outside the mountain silhouette), and additive glows for stations, buildings, lodge and parking lamps (new `glow` atlas frame, `src/scene/night.ts`). Dark UI via a `.night` class on `#app` (CSS variable overrides + a few explicit rules).
 - `?theme=day` / `?theme=night` overrides the default (night on this branch). Bug found on the way: text colour was inherited from `body`, so the HUD was dark on dark until `.night { color }` was set.
 - Screenshots: `screenshots/option-night-theme`.
+
+### Real-GPU check and close-up review (after M8)
+- Used the built-in browser (Apple M2 Pro GPU, ANGLE Metal): 60 fps with 189 guests. Also found a startup bug there: the pane reported a 0x0 viewport at first, the camera zoom became NaN and the map never rendered. Software-GL headless never hit it. Fixed by ignoring sizes under 50 px and repairing non-finite camera state.
+- `scripts/touch.mjs` drives real multi-touch through the DevTools protocol (drag, pinch, tap, scroll-without-buying). It exposed that horizontal panning was impossible when zoomed in (a leftover clamp line). Fixed.
+- `scripts/art-tour.mjs` close-ups showed the zone props sitting on the lift cables. Zone coordinates moved (decisions.md). Also: skiers all landed on one spot at each hub (now spread), `formatNum(999.9T)` printed "1000T" (now "1.00Qa").
+- Phone-width column on desktop/tablet, rotate hint on landscape phones.
+
+### Balance pass 2 (all milestones in tolerance)
+- Two milestones were outside their band (Lower Slopes +147%, Mid Mountain -48%). Cause: the greedy bot never saves for an area while cheap upgrades still pay back, and its one-step estimate cannot see the buildings, zones and housing an area unlocks. Tried: a global unlock bonus (fixes Lower, breaks Peaks), per-area grids (interacting, fiddly), then wrote `scripts/optimize.ts` which found a solution in about 20 s. New numbers in `src/config/balance.ts` and `BOT.areaBonus`; full-simulation cross-check of the first 30 minutes agrees within about 25%.
+- Fixed a flaky test that measured a small cost against a 1e15 balance (float rounding).

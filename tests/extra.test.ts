@@ -25,6 +25,8 @@ describe('number formatting', () => {
     expect(formatNum(3.4e18)).toBe('3.40Qi');
     expect(formatNum(1e22)).toMatch(/e22$/);
     expect(formatMoney(12500)).toBe('$12.5K');
+    expect(formatNum(999.9e12)).toBe('1.00Qa');
+    expect(formatNum(999.9e3)).toBe('1.00M');
     expect(formatTime(3725)).toBe('1h 2m');
   });
 });
@@ -103,5 +105,22 @@ describe('guest behaviour details', () => {
     advance(s, 100);
     expect(s.rt.time).toBeLessThanOrEqual(2.05);
     step(s);
+  });
+});
+
+import { bulkInfo } from '../src/ui/util';
+describe('bulk purchase preview (x1 / x10 / Max)', () => {
+  const cost = (L: number) => 10 * Math.pow(2, L);
+  it('x1 costs the next level, x10 sums ten, capped by the max level', () => {
+    expect(bulkInfo(0, 10, 1, 0, cost)).toEqual({ n: 1, total: 10 });
+    expect(bulkInfo(0, 10, 10, 0, cost).n).toBe(10);
+    expect(bulkInfo(0, 10, 10, 0, cost).total).toBe(10 * (Math.pow(2, 10) - 1));
+    expect(bulkInfo(8, 10, 10, 0, cost).n).toBe(2);
+    expect(bulkInfo(10, 10, 1, 1e9, cost)).toEqual({ n: 0, total: 0 });
+  });
+  it('Max buys as many as are affordable, at least one', () => {
+    expect(bulkInfo(0, 10, 'max', 70, cost)).toEqual({ n: 3, total: 70 }); // 10 + 20 + 40
+    expect(bulkInfo(0, 10, 'max', 5, cost)).toEqual({ n: 1, total: 10 }); // cannot afford: shows the price of one
+    expect(bulkInfo(0, 3, 'max', 1e9, cost).n).toBe(3);
   });
 });
