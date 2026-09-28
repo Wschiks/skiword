@@ -40,6 +40,31 @@ try {
     await cam(600, 2900, 1.6); await wait(page, 800);
     await shot(page, dir, '08-late-village');
   }
+  const click = async sel => { await page.click(sel); await wait(page, 450); };
+  if (want('ui')) {
+    await setup(() => { window.__app.state = window.__core.newGame(3); });
+    await wait(page, 800);
+    await shot(page, dir, 'ui-01-fresh-tutorial');
+    await click('#tab-lifts');
+    await shot(page, dir, 'ui-02-lifts-sheet-fresh');
+    await click('#tab-lifts');
+    await setup(() => { const c = window.__core, b = window.__bot; const s = c.newGame(5); window.__app.state = s; s.tutorial.done = true; b.runBot(s, { mode: 'fast', maxSeconds: 3 * 3600 }); c.simulate(s, 300); s.money += 5000; });
+    await cam(600, 2000, 1); await wait(page, 800);
+    await shot(page, dir, 'ui-03-mid-game-hud');
+    for (const [id, name] of [['lifts', '04-lifts'], ['people', '05-people'], ['mountain', '06-mountain'], ['buildings', '07-buildings'], ['zones', '08-zones'], ['shop', '09-shop']]) {
+      await click('#tab-' + id);
+      await shot(page, dir, 'ui-' + name);
+    }
+    await click('#tab-shop');
+    await page.click('.menu-btn'); await wait(page, 450);
+    await shot(page, dir, 'ui-10-menu');
+    await page.click('.menu-btn'); await wait(page, 300);
+    await page.evaluate(() => document.getElementById('busfab') && document.getElementById('busfab').click());
+    await page.evaluate(() => { document.getElementById('busfab')?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); });
+    await setup(() => { const s = window.__app.state; s.lastSeen = Date.now() - 3 * 3600 * 1000; s.incomeEma = 40; window.dispatchEvent(new Event('focus')); document.dispatchEvent(new Event('visibilitychange')); });
+    await wait(page, 500);
+    await shot(page, dir, 'ui-11-dialog-state');
+  }
   if (errors.length) { console.log('CONSOLE ERRORS:\n' + errors.join('\n')); exit = 1; }
   await browser.close();
 } catch (e) { console.error(e); exit = 1; }

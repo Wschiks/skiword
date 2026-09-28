@@ -12,6 +12,9 @@
     "simulate": "tsx scripts/simulate.ts",
     "screenshots": "node scripts/screenshots.mjs",
     "smoke": "node scripts/smoke.mjs",
+    "flows": "node scripts/flows.mjs",
+    "legal": "tsx scripts/make-legal.ts",
+    "tune": "tsx scripts/tune.ts",
     "cap:sync": "cap sync"
   },
   "dependencies": {

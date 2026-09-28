@@ -4,6 +4,11 @@ import { app } from './app';
 import { MapScene } from './scene/MapScene';
 import { newGame, buyLiftLevel, rebuildLine, buyParkingLevel, buyArea, nextArea, buildLine } from './core/game';
 import { loadState } from './core/save';
+import { initUI, saveNow } from './ui/ui';
+import { setSoundEnabled } from './ui/sound';
+import { initAds } from './ads';
+import { initPurchases } from './purchases';
+import { AUTOSAVE_INTERVAL } from './config/balance';
 
 const params = new URLSearchParams(location.search);
 app.debug = params.has('debug');
@@ -25,6 +30,11 @@ const game = new Phaser.Game({
 });
 (window as any).__game = game;
 (window as any).__app = app;
+
+initUI();
+setSoundEnabled(app.state.settings.sound);
+void initAds(); void initPurchases();
+setInterval(() => saveNow(), AUTOSAVE_INTERVAL * 1000);
 
 app.on('sceneReady', () => {
   document.getElementById('splash')?.classList.add('hide');

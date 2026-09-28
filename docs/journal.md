@@ -23,3 +23,13 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 - Tooling: `scripts/screenshots.mjs` + `shotlib.mjs`; debug keys with `?debug` (L level, R rebuild, P parking, A area, N new line, M money x10); `?new` starts a fresh save.
 - Screenshots: `screenshots/m3-map-v1`.
 
+### M4 UI, M5 Meta, M6 Monetization (mock services)
+- HTML/CSS overlay on top of the canvas (`src/ui/*`): top bar (money, income/s, gems, population with mood face, menu), 3 quest chips, tutorial banner + pulsing ring on the map, "Next" goal pill, floating Ski Bus button, 6 tabs with red dots for affordable-and-useful purchases, bottom sheets (x1/x10/Max), dialogs, toasts, DOM confetti.
+- Inline SVG icons, synthesized WebAudio sfx (coin throttled to 8/s, chime, buzz, horn, fanfare), haptics via Capacitor if present else `navigator.vibrate`.
+- Re-render robustness: sheets re-render from HTML strings only when the string changes; taps are matched by pointerdown/pointerup key + `elementFromPoint`, so a re-render between press and release cannot eat a tap.
+- Save/load (10 s autosave, on hide, on pagehide), welcome-back dialog with optional "Double it" rewarded ad, New Season dialog, two-step reset, legal pages (generated from `src/config/legal.ts`, placeholders for the publisher block).
+- Ads and purchases go through `src/ads.ts` / `src/purchases.ts`: mock on web (1.5 s fake ad), AdMob / store hooks for device wired in M8.
+- New scripts: `npm run smoke` (17 Playwright checks: canvas, first upgrade, six sheets, map tap, drag, autosave, no console errors) and `npm run flows` (18 checks: persistence, offline dialog, quest claim, ski bus with gems and mock ad, cash bundle, mock IAP, prestige, reset).
+- Screenshots: `screenshots/m4-ui-v1`.
+- A version of the lift row where "Rebuild: Gondola 12" wrapped onto 3 lines was replaced by stacked buttons (label over cost) whenever a row has two buttons.
+
