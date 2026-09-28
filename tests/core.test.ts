@@ -49,6 +49,7 @@ describe('buy rules', () => {
     s.lines[0].level = 8;
     expect(rebuildLine(s, 'bunny:0').ok).toBe(true);
     expect(s.unlockedTier).toBe(3);
+    s.money = 1e7; // small balance: measuring a cost against 1e15 would only test float rounding
     const before = s.money;
     expect(buildLine(s, 'bunny', 1, 3).ok).toBe(true);
     expect(before - s.money).toBeCloseTo(slotCost("bunny", 1) + tierBuildCost(3));

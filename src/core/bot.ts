@@ -21,6 +21,8 @@ export function cloneCore(s: GameState): GameState {
 }
 
 const REBUILD_VALUE_LEVEL = 5;
+/** Buying an area unlocks slopes, buildings, zones and housing whose value the one-step estimate cannot see; this scales the bundle value. */
+export const BOT = { areaBonus: [1, 2.62, 1.5, 0.723, 2.99] as number[] };
 
 export interface Milestone { id: string; label: string; target: number; check: (s: GameState) => boolean; tol?: number }
 const maxTierOf = (s: GameState) => Math.max(...s.lines.map(l => l.tier));
@@ -83,6 +85,7 @@ function scoreOne(s: GameState, base: number, p: Purchase): Scored {
       }
     }
     if (best) { delta = best.delta; cost = best.cost; } else delta = Math.max(delta, base * 0.02);
+    delta *= BOT.areaBonus[areaIndex(p.key.split(':')[1])] ?? 1;
     return { p, cost: p.cost, delta, payback: cost / Math.max(delta, 1e-9) };
   }
   return { p, cost, delta, payback: delta > 1e-12 ? cost / delta : Infinity };

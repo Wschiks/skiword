@@ -47,3 +47,7 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 - `scripts/touch.mjs` drives real multi-touch through the DevTools protocol (drag, pinch, tap, scroll-without-buying). It exposed that horizontal panning was impossible when zoomed in (a leftover clamp line). Fixed.
 - `scripts/art-tour.mjs` close-ups showed the zone props sitting on the lift cables. Zone coordinates moved (decisions.md). Also: skiers all landed on one spot at each hub (now spread), `formatNum(999.9T)` printed "1000T" (now "1.00Qa").
 - Phone-width column on desktop/tablet, rotate hint on landscape phones.
+
+### Balance pass 2 (all milestones in tolerance)
+- Two milestones were outside their band (Lower Slopes +147%, Mid Mountain -48%). Cause: the greedy bot never saves for an area while cheap upgrades still pay back, and its one-step estimate cannot see the buildings, zones and housing an area unlocks. Tried: a global unlock bonus (fixes Lower, breaks Peaks), per-area grids (interacting, fiddly), then wrote `scripts/optimize.ts` which found a solution in about 20 s. New numbers in `src/config/balance.ts` and `BOT.areaBonus`; full-simulation cross-check of the first 30 minutes agrees within about 25%.
+- Fixed a flaky test that measured a small cost against a 1e15 balance (float rounding).

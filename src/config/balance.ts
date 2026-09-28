@@ -27,8 +27,8 @@ export const AUTOSAVE_INTERVAL = 10;
  * `tier` has one entry per lift tier (1..10) and `area` one entry per area (bunny..glacier).
  */
 export const TUNE = {
-  parking: 1.39, housing: 1, slot: 1, building: 0.226, zone: 1,
-  liftLevel: [1, 1, 1, 1, 1, 1, 0.35, 0.35, 0.35, 0.35] as number[],
-  tier: [1, 1.18, 3.98, 4.18, 4.4, 4.74, 5.5, 4.4, 4.4, 4.6] as number[],
-  area: [1, 0.33, 0.4, 1.5, 1.4] as number[],
+  parking: 1.64, housing: 1, slot: 1.19, building: 0.353, zone: 0.371,
+  liftLevel: [1, 1, 1, 1, 1, 1, 0.178, 0.531, 0.183, 0.582] as number[],
+  tier: [1, 1.36, 4.86, 7.66, 5.26, 8.42, 5.24, 4.84, 2.96, 3.99] as number[],
+  area: [1, 0.402, 1.21, 1.17, 2.49] as number[],
 };
