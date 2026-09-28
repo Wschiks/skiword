@@ -2,7 +2,7 @@ import { APP_NAME, APP_VERSION, CREDITS, PRIVACY, PUBLISHER, TERMS } from '../co
 import { canNewSeason, seasonPreview, seasonBonus } from '../core/game';
 import type { Ctx } from './types';
 import { icons } from './icons';
-import { formatNum } from './format';
+import { formatMoney, formatNum } from './format';
 
 export const HELP = [
   ['Guests pay per ride', 'Every guest pays each time they board a lift, not once per visit. Upgrade lifts to earn more per ride and carry more people.'],
@@ -26,6 +26,13 @@ export function render(c: Ctx): string {
     <div class="btns"><button class="btn gold" data-act="season"><span class="btn-l">Start New Season</span></button></div>`;
   else html += `<div class="sub pad">${can.reason === 'areas' ? 'Own all 5 mountain areas to unlock.' : `Earn more: you would gain ${pv.gain} Season Points and need 5.`}</div>`;
   html += `</div>`;
+  const src = s.rt.src, srcTotal = Math.max(1, src.rides + src.zones + src.buildings);
+  const pct = (v: number) => `${Math.round((v / srcTotal) * 100)}%`;
+  html += `<div class="card"><div class="title">Stats</div><div class="stats wide">
+    <div>Lifetime earned<b>${formatMoney(s.lifetimeEarned)}</b></div><div>This season<b>${formatMoney(s.earnedThisSeason)}</b></div>
+    <div>Rides given<b>${formatNum(s.stats.ridesTotal)}</b></div><div>Guests served<b>${formatNum(s.stats.guestsServed)}</b></div>
+    <div>Angry leaves<b>${formatNum(s.stats.angryLeaves)}</b></div><div>Season<b>${s.season}</b></div></div>
+    <div class="sub pad">Income this session: rides ${pct(src.rides)}, zones ${pct(src.zones)}, buildings ${pct(src.buildings)}</div></div>`;
   html += `<div class="group-h">Help</div>` + HELP.map(([t, b]) => `<div class="card slim help"><div class="title">${t}</div><div class="sub">${b}</div></div>`).join('');
   html += `<div class="group-h">About</div><div class="card"><div class="btns wrap">
     <button class="btn ghost" data-act="legal" data-a="terms"><span class="btn-l">Terms</span></button>

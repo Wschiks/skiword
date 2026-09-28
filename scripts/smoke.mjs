@@ -34,6 +34,13 @@ try {
   await page.click('.menu-btn'); await wait(page, 200);
   check('sheet closes', !(await page.isVisible('#sheet')));
 
+  // the live sheet is updated in place: elements must survive the 4 Hz refresh (keeps touch scroll momentum and pressed state)
+  await page.click('#tab-lifts'); await wait(page, 300);
+  await page.evaluate(() => { window.__probe = document.querySelector('#sheet-body [data-act="lvl"]'); });
+  await wait(page, 900);
+  check('sheet buttons stay attached across refreshes (in-place update)', await page.evaluate(() => !!window.__probe && window.__probe.isConnected));
+  await page.click('.menu-btn'); await wait(page, 200); await page.click('.menu-btn'); await wait(page, 200);
+
   // map tap on the lift opens the lifts sheet
   const pos = await page.evaluate(() => {
     const sc = window.__game.scene.getScene('map'); const mv = sc.mv; const b = { x: 400, y: 2860 };
