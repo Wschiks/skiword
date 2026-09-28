@@ -15,6 +15,7 @@ import { formatMoney, formatNum, formatRate, formatTime } from './format';
 import { sfx, haptic, initAudio, setSoundEnabled, setHapticsEnabled } from './sound';
 import { confetti } from './confetti';
 import { bar } from './util';
+import { morph } from './morph';
 import { tutorialStep, ANGRY_TOAST } from './tutorial';
 import { renderQuests } from './quests';
 import * as lifts from './liftSheet';
@@ -44,7 +45,8 @@ let modalOpen: string | null = null;
 
 const $ = (id: string) => document.getElementById(id)!;
 const cache = new WeakMap<HTMLElement, string>();
-function setHTML(el: HTMLElement, html: string) { if (cache.get(el) !== html) { el.innerHTML = html; cache.set(el, html); } }
+/** in-place update (see morph.ts): keeps element identity, scroll momentum and pressed state across the 4 Hz refreshes */
+function setHTML(el: HTMLElement, html: string) { if (cache.get(el) !== html) { morph(el, html); cache.set(el, html); } }
 
 export function initUI() {
   const root = $('ui');
@@ -416,11 +418,7 @@ function renderAll(immediate: boolean) {
     const body = $('sheet-body');
     const mod = MODS[open];
     const html = mod.render(ctx);
-    if (cache.get(body) !== html) {
-      const st = body.scrollTop;
-      body.innerHTML = html; cache.set(body, html);
-      body.scrollTop = st;
-    }
+    setHTML(body, html);
     if (ctx.focus) {
       const el = ctx.focus === 'line-slot' ? body.querySelector('.picker')?.parentElement : document.getElementById(`line-${ctx.focus}`);
       if (el) { (el as HTMLElement).scrollIntoView({ block: 'nearest' }); ctx.focus = null; }
