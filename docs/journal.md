@@ -41,3 +41,9 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 
 ### M8 Native
 - Capacitor 8 projects for Android and iOS (SPM). AdMob (test ids, `LIVE=false`), native purchases, haptics, splash, status bar wired behind the existing services. Icons/splash generated from code (`npm run icons`). `cap sync` works. **Not compiled on this machine** (no Xcode / Android SDK), see `docs/native.md`.
+
+### Real-GPU check and close-up review (after M8)
+- Used the built-in browser (Apple M2 Pro GPU, ANGLE Metal): 60 fps with 189 guests. Also found a startup bug there: the pane reported a 0x0 viewport at first, the camera zoom became NaN and the map never rendered. Software-GL headless never hit it. Fixed by ignoring sizes under 50 px and repairing non-finite camera state.
+- `scripts/touch.mjs` drives real multi-touch through the DevTools protocol (drag, pinch, tap, scroll-without-buying). It exposed that horizontal panning was impossible when zoomed in (a leftover clamp line). Fixed.
+- `scripts/art-tour.mjs` close-ups showed the zone props sitting on the lift cables. Zone coordinates moved (decisions.md). Also: skiers all landed on one spot at each hub (now spread), `formatNum(999.9T)` printed "1000T" (now "1.00Qa").
+- Phone-width column on desktop/tablet, rotate hint on landscape phones.

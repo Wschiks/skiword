@@ -11,11 +11,11 @@ export class ZoneView {
   constructor(scene: Phaser.Scene) {
     for (const z of ZONES) {
       const key = z.id === 'park' ? 'zone_park1' : `zone_${z.id}`;
-      const im = scene.add.image(z.pos.x, z.pos.y, ATLAS, key).setOrigin(0, 1).setScale(1.5 / S).setDepth(z.pos.y).setVisible(false);
+      const im = scene.add.image(z.pos.x, z.pos.y, ATLAS, key).setOrigin(0, 1).setScale(1.05 / S).setDepth(z.pos.y).setVisible(false);
       this.imgs.set(z.id, im);
-      const plot = scene.add.image(z.pos.x + 70, z.pos.y - 20, ATLAS, 'plus').setScale(1.9 / S).setDepth(z.pos.y + 5).setVisible(false);
+      const plot = scene.add.image(z.pos.x + 60, z.pos.y - 24, ATLAS, 'plus').setScale(1.9 / S).setDepth(z.pos.y + 5).setVisible(false);
       this.plots.set(z.id, plot);
-      const lb = scene.add.text(z.pos.x + 100, z.pos.y - 110, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000).setVisible(false);
+      const lb = scene.add.text(z.pos.x + 75, z.pos.y - 84, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000).setVisible(false);
       this.labels.set(z.id, lb);
     }
   }
@@ -38,7 +38,7 @@ export class ZoneView {
     }
   }
   hit(wx: number, wy: number): string | null {
-    for (const z of ZONES) if (wx > z.pos.x - 10 && wx < z.pos.x + 240 && wy > z.pos.y - 100 && wy < z.pos.y + 15) return z.id;
+    for (const z of ZONES) if (wx > z.pos.x - 10 && wx < z.pos.x + 170 && wy > z.pos.y - 80 && wy < z.pos.y + 15) return z.id;
     return null;
   }
 }

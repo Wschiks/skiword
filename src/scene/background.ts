@@ -188,7 +188,7 @@ export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer)
     });
   });
   for (const b of BUILDINGS) keepOut.push({ x: b.pos.x, y: b.pos.y, r: 90 });
-  for (const z of ZONES) keepOut.push({ x: z.pos.x + 60, y: z.pos.y, r: 110 });
+  for (const z of ZONES) keepOut.push({ x: z.pos.x + 70, y: z.pos.y - 30, r: 100 });
   const free = (x: number, y: number) => !keepOut.some(k => (k.x - x) ** 2 + (k.y - y) ** 2 < k.r * k.r);
   const keys = ['pine_s', 'pine_m', 'pine_l'];
   for (let y = 40; y < 2890; y += 30) {

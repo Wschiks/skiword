@@ -15,3 +15,5 @@ One line each. Newest at the bottom.
 - Camera zoom is expressed relative to fit-width zoom: min 0.85x, max 3.2x (spec's 0.6 to 1.6 assumed absolute zoom; at 390 px width fit-width is ~0.32).
 - Guest sprites are drawn about 28 world units tall (spec says about 22) so they stay visible at fit-width zoom on a phone.
 - Season Points bonus shows in the top bar of the menu; New Season keeps `stats` (lifetime counters).
+- Zone positions moved (spec coordinates put the Kids' Park, Terrain Park and Off-Piste on top of the lift cables that the spec's slot geometry produces): Kids' Park (44, 2170), Terrain Park (44, 1440), Slalom (960, 1240), Off-Piste (935, 690). Props drawn at 1.05x. Found with a close-up art tour (`screenshots/m7-art-tour`).
+- Bug fixed on the way: horizontal panning was impossible when zoomed in (stale clamp line); the touch test now checks it.

@@ -43,6 +43,17 @@ const d = await mv();
 check('pinch in zooms out', d.z < c.z * 0.8, `zoom ${c.z.toFixed(3)} -> ${d.z.toFixed(3)}`);
 check('zoom stays within limits', d.z >= d.fit * 0.85 - 1e-6 && d.z <= d.fit * 3.2 + 1e-6);
 
+// zoomed in, a horizontal drag must pan sideways
+await page.evaluate(() => window.__game.scene.getScene('map').mv.focus(600, 2400, 2.5));
+await page.waitForTimeout(200);
+const h0 = await mv();
+await touch('touchStart', [[300, 400]]);
+for (let i = 1; i <= 8; i++) { await touch('touchMove', [[300 - i * 20, 400]]); await page.waitForTimeout(16); }
+await touch('touchEnd', []);
+await page.waitForTimeout(100);
+const h1 = await mv();
+check('zoomed in, dragging left pans the map sideways', h1.cx > h0.cx + 40, `cx ${h0.cx.toFixed(0)} -> ${h1.cx.toFixed(0)}`);
+
 // tap on the lift opens the lifts sheet
 await page.evaluate(() => window.__game.scene.getScene('map').mv.focus(600, 2700, 1));
 await page.waitForTimeout(300);

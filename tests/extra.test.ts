@@ -25,6 +25,8 @@ describe('number formatting', () => {
     expect(formatNum(3.4e18)).toBe('3.40Qi');
     expect(formatNum(1e22)).toMatch(/e22$/);
     expect(formatMoney(12500)).toBe('$12.5K');
+    expect(formatNum(999.9e12)).toBe('1.00Qa');
+    expect(formatNum(999.9e3)).toBe('1.00M');
     expect(formatTime(3725)).toBe('1h 2m');
   });
 });

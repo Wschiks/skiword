@@ -4,15 +4,15 @@ export interface ZoneDef {
   stay: number; baseP: number; pos: { x: number; y: number }; stages?: ZoneStage[];
 }
 export const ZONES: ZoneDef[] = [
-  { id: 'kids',     name: "Kids' Park",    requiresArea: 'lower', cost: 5000,    fee: 3,  capacity: 8,  stay: 20, baseP: 0.10, pos: { x: 180, y: 2150 } },
-  { id: 'park',     name: 'Terrain Park',  requiresArea: 'mid',   cost: 60000,   fee: 6,  capacity: 10, stay: 18, baseP: 0.18, pos: { x: 200, y: 1450 },
+  { id: 'kids',     name: "Kids' Park",    requiresArea: 'lower', cost: 5000,    fee: 3,  capacity: 8,  stay: 20, baseP: 0.10, pos: { x: 44, y: 2170 } },
+  { id: 'park',     name: 'Terrain Park',  requiresArea: 'mid',   cost: 60000,   fee: 6,  capacity: 10, stay: 18, baseP: 0.18, pos: { x: 44, y: 1440 },
     stages: [
       { name: 'Rails and Small Jumps', cost: 60000,   fee: 6,  capacity: 10 },
       { name: 'Big Jumps',             cost: 150000,  fee: 15, capacity: 14 },
       { name: 'Half-Pipe',             cost: 2000000, fee: 40, capacity: 18 },
     ] },
-  { id: 'slalom',   name: 'Slalom Course', requiresArea: 'mid',   cost: 90000,   fee: 10, capacity: 12, stay: 18, baseP: 0.15, pos: { x: 850, y: 1250 } },
-  { id: 'offpiste', name: 'Off-Piste',     requiresArea: 'peaks', cost: 1200000, fee: 45, capacity: 8,  stay: 30, baseP: 0.08, pos: { x: 200, y: 800 } },
+  { id: 'slalom',   name: 'Slalom Course', requiresArea: 'mid',   cost: 90000,   fee: 10, capacity: 12, stay: 18, baseP: 0.15, pos: { x: 960, y: 1240 } },
+  { id: 'offpiste', name: 'Off-Piste',     requiresArea: 'peaks', cost: 1200000, fee: 45, capacity: 8,  stay: 30, baseP: 0.08, pos: { x: 935, y: 690 } },
 ];
 export const ZONE_PREFERENCE: Record<string, { board: number; ski: number }> = {
   park:     { board: 1.8, ski: 0.6 },
