@@ -33,3 +33,11 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 - Screenshots: `screenshots/m4-ui-v1`.
 - A version of the lift row where "Rebuild: Gondola 12" wrapped onto 3 lines was replaced by stacked buttons (label over cost) whenever a row has two buttons.
 
+### M7 Polish
+- Perf: measured 0.34 ms of JS per frame with 190 guests (`npm run perf`). The headless 26 fps is software GL, not the game. To keep phone GPUs happy every sprite now lives in ONE atlas texture (`atlas`), so the depth-sorted scene batches in about one draw call instead of breaking on each texture change. Rejected alternative: baking decor into a huge canvas (needed 35+ MB of texture memory).
+- Tests grew to 48: number formatting, income never drops on rebuild (all tiers, 4 areas, 4 population levels), monotonic cost sequences, 4+ purchases in the first minute, tutorial steps, lobby.
+- Accessibility: tap targets >= 44 px, text >= 10.5 px, contrast fixes on muted text and disabled buttons, focus-visible ring, aria roles on modal/toasts, `prefers-reduced-motion`.
+- Added a decorative gondola bridge (cable, towers, moving cabin) across the canyon once the Glacier is owned.
+
+### M8 Native
+- Capacitor 8 projects for Android and iOS (SPM). AdMob (test ids, `LIVE=false`), native purchases, haptics, splash, status bar wired behind the existing services. Icons/splash generated from code (`npm run icons`). `cap sync` works. **Not compiled on this machine** (no Xcode / Android SDK), see `docs/native.md`.

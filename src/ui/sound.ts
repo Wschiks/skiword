@@ -1,4 +1,9 @@
 /** WebAudio synthesized sounds. No files. Master toggle in settings. */
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+
+let hapticsEnabled = true;
+export function setHapticsEnabled(v: boolean) { hapticsEnabled = v; }
 let ctx: AudioContext | null = null;
 let enabled = true;
 let lastCoin = 0;
@@ -43,9 +48,9 @@ export const sfx = {
 };
 
 export function haptic(kind: 'light' | 'medium' = 'light') {
+  if (!hapticsEnabled) return;
   try {
-    const cap = (window as any).Capacitor?.Plugins?.Haptics;
-    if (cap?.impact) { cap.impact({ style: kind === 'light' ? 'LIGHT' : 'MEDIUM' }); return; }
+    if (Capacitor.isNativePlatform()) { void Haptics.impact({ style: kind === 'light' ? ImpactStyle.Light : ImpactStyle.Medium }); return; }
     navigator.vibrate?.(kind === 'light' ? 8 : 16);
   } catch { /* ignore */ }
 }

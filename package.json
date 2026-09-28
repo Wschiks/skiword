@@ -15,12 +15,23 @@
     "flows": "node scripts/flows.mjs",
     "legal": "tsx scripts/make-legal.ts",
     "tune": "tsx scripts/tune.ts",
+    "icons": "node scripts/make-icons.mjs && npx @capacitor/assets generate --android --ios --iconBackgroundColor #8FC4E8 --splashBackgroundColor #8FC4E8",
     "cap:sync": "cap sync"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^8.1.0",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
+    "@capgo/native-purchases": "^8.8.1",
     "phaser": "^4.2.1"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
     "@types/node": "^26.6.3",
     "playwright": "^1.63.0",
     "tsx": "^4.23.15",

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { ZONES } from '../config/zones';
-import { S } from './art';
+import { ATLAS, S } from './art';
 import { areaOwned } from '../core/state';
 import type { GameState } from '../core/game';
 
@@ -11,9 +11,9 @@ export class ZoneView {
   constructor(private scene: Phaser.Scene) {
     for (const z of ZONES) {
       const key = z.id === 'park' ? 'zone_park1' : `zone_${z.id}`;
-      const im = scene.add.image(z.pos.x, z.pos.y, key).setOrigin(0, 1).setScale(1.5 / S).setDepth(z.pos.y).setVisible(false);
+      const im = scene.add.image(z.pos.x, z.pos.y, ATLAS, key).setOrigin(0, 1).setScale(1.5 / S).setDepth(z.pos.y).setVisible(false);
       this.imgs.set(z.id, im);
-      const plot = scene.add.image(z.pos.x + 70, z.pos.y - 20, 'plus').setScale(1.9 / S).setDepth(z.pos.y + 5).setVisible(false);
+      const plot = scene.add.image(z.pos.x + 70, z.pos.y - 20, ATLAS, 'plus').setScale(1.9 / S).setDepth(z.pos.y + 5).setVisible(false);
       this.plots.set(z.id, plot);
       const lb = scene.add.text(z.pos.x + 100, z.pos.y - 110, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000).setVisible(false);
       this.labels.set(z.id, lb);
@@ -26,7 +26,7 @@ export class ZoneView {
       im.setVisible(zs.owned);
       if (zs.owned && z.stages) {
         const key = `zone_park${zs.stage + 1}`;
-        if (im.texture.key !== key) im.setTexture(key);
+        if (im.frame.name !== key) im.setFrame(key);
       }
       plot.setVisible(!zs.owned && areaOwned(s, z.requiresArea)).setScale((1.9 / S) * (1 + Math.sin(time * 3 + z.pos.x) * 0.08));
       if (zs.owned) {

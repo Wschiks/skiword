@@ -14,7 +14,7 @@ import { ads } from '../ads';
 import { purchases } from '../purchases';
 import { icons } from './icons';
 import { formatMoney, formatNum, formatRate, formatTime } from './format';
-import { sfx, haptic, initAudio, setSoundEnabled } from './sound';
+import { sfx, haptic, initAudio, setSoundEnabled, setHapticsEnabled } from './sound';
 import { confetti } from './confetti';
 import { bar } from './util';
 import { tutorialStep, ANGRY_TOAST } from './tutorial';
@@ -54,12 +54,12 @@ export function initUI() {
     <div id="topbar" class="pe"></div>
     <div id="quests" class="pe"></div>
     <div id="tut" class="pe hidden"></div>
-    <div id="toasts"></div>
+    <div id="toasts" role="status" aria-live="polite"></div>
     <div id="dock" class="pe"><button id="next" class="next" data-act="next"></button><button id="busfab" class="busfab hidden" data-act="busmodal">${icons.bus}<span>Ski Bus</span></button></div>
     <div id="sheet" class="pe hidden"><div class="grab" id="grab"><i></i></div><div class="sheet-h"><div id="sheet-title" class="sheet-title"></div><button class="icon-btn" data-act="close" aria-label="Close">${icons.close}</button></div>
       <div id="sheet-hint" class="hintline"></div><div id="sheet-body" class="sheet-body"></div></div>
     <div id="tabs" class="pe">${TABS.map(t => `<button class="tab" data-act="tab" data-a="${t.id}" id="tab-${t.id}">${icons[t.icon]}<span>${t.label}</span><i class="dot hidden"></i></button>`).join('')}</div>
-    <div id="modal" class="hidden"><div class="modal-card" id="modal-card"></div></div>`;
+    <div id="modal" class="hidden"><div class="modal-card" id="modal-card" role="dialog" aria-modal="true"></div></div>`;
 
   app.on('sceneReady', (s: MapScene) => { scene = s; });
   app.on('mapTap', (h: MapHit) => onMapTap(h));
@@ -185,7 +185,7 @@ function handle(name: string, a: string, b: string, el: HTMLElement): ActResult 
     case 'product': { void buyProduct(a); return { ok: true, silent: true }; }
     case 'restore': { void restore(); return { ok: true, silent: true }; }
     case 'sound': s.settings.sound = !s.settings.sound; setSoundEnabled(s.settings.sound); return { ok: true, silent: true };
-    case 'haptics': s.settings.haptics = !s.settings.haptics; return { ok: true, silent: true };
+    case 'haptics': s.settings.haptics = !s.settings.haptics; setHapticsEnabled(s.settings.haptics); return { ok: true, silent: true };
     case 'legal': showLegal(a); return { ok: true, silent: true };
     case 'season': showSeasonConfirm(); return { ok: true, silent: true };
     case 'season-yes': {

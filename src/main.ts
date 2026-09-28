@@ -5,7 +5,7 @@ import { MapScene } from './scene/MapScene';
 import { newGame, buyLiftLevel, rebuildLine, buyParkingLevel, buyArea, nextArea, buildLine } from './core/game';
 import { loadState } from './core/save';
 import { initUI, saveNow } from './ui/ui';
-import { setSoundEnabled } from './ui/sound';
+import { setSoundEnabled, setHapticsEnabled } from './ui/sound';
 import { initAds } from './ads';
 import { initPurchases } from './purchases';
 import { AUTOSAVE_INTERVAL } from './config/balance';
@@ -33,6 +33,7 @@ const game = new Phaser.Game({
 
 initUI();
 setSoundEnabled(app.state.settings.sound);
+setHapticsEnabled(app.state.settings.haptics);
 void initAds(); void initPurchases();
 setInterval(() => saveNow(), AUTOSAVE_INTERVAL * 1000);
 

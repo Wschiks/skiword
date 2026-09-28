@@ -7,3 +7,5 @@ If you spot something in an early folder that was later removed or changed, the 
 |---|---|---|
 | `m3-map-v1` | `m3-map` | First playable map: fresh game, 7 min, 3 h mid game (bot-played), 40 h late game (glacier, canyon, village) |
 | `m4-ui-v1` | `m4-m6-ui` | HTML overlay: fresh-game tutorial, mid-game HUD, the six sheets (lifts, people, mountain, buildings, zones, shop), menu, welcome-back dialog |
+| `m3-map-v2-atlas` | `m7-polish` | Map after packing every sprite into one texture atlas (perf change, should look identical) |
+| `m7-polish` | `m7-m8-polish-native` | Final polish set: fresh start, early, mid, late (canyon gondola bridge), HUD and all sheets with accessibility tweaks |

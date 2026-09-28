@@ -3,7 +3,7 @@ import { AREAS, CANYON_BAND } from '../config/areas';
 import { BUILDINGS } from '../config/facilities';
 import { ZONES } from '../config/zones';
 import { LODGE_POS, PARKING_POS, ROAD_Y, WORLD, hub, slotBase, slotTop } from '../config/layout';
-import { bake } from './art';
+import { ATLAS, bakeTexture } from './art';
 import { mulberry32 } from './rand';
 
 /** left edge of the mountain silhouette at world y (right edge is mirrored) */
@@ -19,7 +19,7 @@ export function edgeL(y: number): number {
 const SNOW = ['#F4F8FB', '#EEF5FB', '#E8F1F9', '#E1EDF7', '#D5EAF8'];
 
 export function bakeBackground(scene: Phaser.Scene) {
-  bake(scene, 'bg', WORLD.w, WORLD.h, c => {
+  bakeTexture(scene, 'bg', WORLD.w, WORLD.h, c => {
     const rnd = mulberry32(42);
     // sky
     const sky = c.createLinearGradient(0, 0, 0, 2600);
@@ -202,7 +202,7 @@ export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer)
         const yy = y + rnd() * 26;
         if (!free(x, yy) || rnd() < 0.2) continue;
         const key = keys[Math.floor(rnd() * 3)];
-        const img = scene.add.image(x, yy, key).setOrigin(0.5, 1).setScale(0.5 * (0.85 + rnd() * 0.3));
+        const img = scene.add.image(x, yy, ATLAS, key).setOrigin(0.5, 1).setScale(0.5 * (0.85 + rnd() * 0.3));
         img.setDepth(yy); layer.add(img);
       }
     }
@@ -213,7 +213,7 @@ export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer)
     if (y > 495 && y < 575) continue;
     const x = edgeL(y) + 60 + rnd() * (WORLD.w - 2 * edgeL(y) - 120);
     if (!free(x, y) || rnd() < 0.35) continue;
-    const img = scene.add.image(x, y, rnd() < 0.7 ? keys[Math.floor(rnd() * 3)] : ['rock_a', 'rock_b'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.4));
+    const img = scene.add.image(x, y, ATLAS, rnd() < 0.7 ? keys[Math.floor(rnd() * 3)] : ['rock_a', 'rock_b'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.4));
     img.setDepth(y); layer.add(img);
   }
   // rocks along ridge lines
@@ -221,7 +221,7 @@ export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer)
     for (let i = 0; i < 6; i++) {
       const y = a.band[0] + 4 + rnd() * 10, x = 100 + rnd() * 1000;
       if (!free(x, y)) continue;
-      const img = scene.add.image(x, y, ['rock_b', 'rock_c'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.5));
+      const img = scene.add.image(x, y, ATLAS, ['rock_b', 'rock_c'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.5));
       img.setDepth(y); layer.add(img);
     }
   }
@@ -229,7 +229,7 @@ export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer)
   for (let i = 0; i < 14; i++) {
     const x = 40 + rnd() * 1120, y = 2915 + rnd() * 30;
     if (Math.abs(x - 600) < 120 || x < 380 || (x > 900 && x < 1140)) continue;
-    const img = scene.add.image(x, y, keys[Math.floor(rnd() * 3)]).setOrigin(0.5, 1).setScale(0.5);
+    const img = scene.add.image(x, y, ATLAS, keys[Math.floor(rnd() * 3)]).setOrigin(0.5, 1).setScale(0.5);
     img.setDepth(y); layer.add(img);
   }
 }

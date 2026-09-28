@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { NativePurchases as Store, PURCHASE_TYPE } from '@capgo/native-purchases';
 import { PRODUCTS } from './config/shop';
 
 export interface PurchasesService {
@@ -22,25 +24,30 @@ class MockPurchases implements PurchasesService {
   }
 }
 
-/** Store purchases on device via cordova-plugin-purchase / RevenueCat style plugin; falls back to the mock. */
+/** Store purchases on device via StoreKit 2 / Google Play Billing (@capgo/native-purchases). */
 class NativePurchases implements PurchasesService {
   name = 'store';
   private prices = new Map<string, string>();
-  constructor(private plugin: any) { void this.load(); }
+  constructor() { void this.load(); }
   private async load() {
     try {
-      const { products } = await this.plugin.getProducts({ productIdentifiers: PRODUCTS.map(p => p.id) });
-      for (const p of products ?? []) this.prices.set(p.identifier ?? p.productIdentifier, p.priceString ?? p.price);
-    } catch { /* fallback prices */ }
+      const { products } = await Store.getProducts({ productIdentifiers: PRODUCTS.map(p => p.id), productType: PURCHASE_TYPE.INAPP });
+      for (const p of products) if (p.identifier) this.prices.set(p.identifier, p.priceString);
+    } catch { /* keep fallback prices */ }
   }
   priceOf(id: string) { return this.prices.get(id) ?? PRODUCTS.find(p => p.id === id)?.fallbackPrice ?? ''; }
   async purchase(id: string) {
-    try { await this.plugin.purchaseProduct({ productIdentifier: id }); return true; } catch { return false; }
+    const p = PRODUCTS.find(x => x.id === id);
+    try {
+      await Store.purchaseProduct({ productIdentifier: id, productType: PURCHASE_TYPE.INAPP, isConsumable: p?.kind === 'consumable' });
+      return true;
+    } catch { return false; }
   }
   async restore() {
     try {
-      const r = await this.plugin.restorePurchases();
-      return (r?.customerInfo?.entitlements ? Object.keys(r.customerInfo.entitlements.active ?? {}) : r?.ids ?? []) as string[];
+      await Store.restorePurchases();
+      const { purchases } = await Store.getPurchases({ productType: PURCHASE_TYPE.INAPP });
+      return purchases.map(x => x.productIdentifier);
     } catch { return []; }
   }
 }
@@ -48,10 +55,5 @@ class NativePurchases implements PurchasesService {
 export let purchases: PurchasesService = new MockPurchases();
 
 export async function initPurchases() {
-  try {
-    const cap = (window as any).Capacitor;
-    if (!cap?.isNativePlatform?.()) return;
-    const plugin = cap.Plugins?.Purchases ?? cap.Plugins?.InAppPurchase;
-    if (plugin) purchases = new NativePurchases(plugin);
-  } catch { /* stay on mock */ }
+  if (Capacitor.isNativePlatform()) purchases = new NativePurchases();
 }

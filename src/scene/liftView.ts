@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { AREAS, areaIndex } from '../config/areas';
 import { slotBase, slotTop } from '../config/layout';
-import { S } from './art';
+import { ATLAS, S } from './art';
 import { tierDef, rideTime } from '../core/economy';
 import type { GameState, Line } from '../core/game';
 
@@ -19,6 +19,7 @@ export class LiftView {
   private labels = new Map<string, Phaser.GameObjects.Text>();
   private plus: { img: Phaser.GameObjects.Image; areaId: string; slot: number }[] = [];
   private sig = '';
+  private bridgeCabin: Phaser.GameObjects.Image | null = null;
 
   constructor(private scene: Phaser.Scene) {
     this.cable = scene.add.graphics().setDepth(3500);
@@ -39,9 +40,21 @@ export class LiftView {
       a.slots.forEach((_, i) => {
         if (s.lines.some(l => l.areaId === a.id && l.slot === i)) return;
         const b = slotBase(areaIndex(a.id), i);
-        const img = this.scene.add.image(b.x, b.y - 12, 'plus').setScale(1.9 / S).setDepth(b.y + 10);
+        const img = this.scene.add.image(b.x, b.y - 12, ATLAS, 'plus').setScale(1.9 / S).setDepth(b.y + 10);
         this.statics.push(img); this.plus.push({ img, areaId: a.id, slot: i });
       });
+    }
+    // decorative gondola bridge across the canyon once the Glacier is owned
+    this.bridgeCabin = null;
+    if (s.areasOwned.includes('glacier')) {
+      for (const x of [170, 1030]) {
+        const tw = this.scene.add.image(x, 560, ATLAS, 'tower').setOrigin(0.5, 1).setScale(2.2 / S).setDepth(560);
+        this.statics.push(tw);
+      }
+      this.cable.lineStyle(2.4, 0x37424f, 1);
+      this.cable.beginPath(); this.cable.moveTo(170, 505); this.cable.lineTo(1030, 505); this.cable.strokePath();
+      this.bridgeCabin = this.scene.add.image(600, 505, ATLAS, 'carrier_cabin').setOrigin(0.5, 0).setScale(1.6 / S).setDepth(4000);
+      this.statics.push(this.bridgeCabin);
     }
     for (const [id, t] of this.labels) if (!s.lines.some(l => l.id === id)) { t.destroy(); this.labels.delete(id); }
   }
@@ -58,11 +71,11 @@ export class LiftView {
     const n = Math.max(2, Math.floor(len / 95));
     for (let k = 1; k <= n; k++) {
       const u = k / (n + 1);
-      const im = this.scene.add.image(f.x + (e.x - f.x) * u, f.y + (e.y - f.y) * u + 26, 'tower').setOrigin(0.5, 1).setScale(1.2 / S * 2 / 2).setDepth(f.y + (e.y - f.y) * u + 26);
+      const im = this.scene.add.image(f.x + (e.x - f.x) * u, f.y + (e.y - f.y) * u + 26, ATLAS, 'tower').setOrigin(0.5, 1).setScale(1.2 / S * 2 / 2).setDepth(f.y + (e.y - f.y) * u + 26);
       this.statics.push(im);
     }
-    const base = this.scene.add.image(b.x, b.y - 2, 'station').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(b.y + 1);
-    const top = this.scene.add.image(t.x, t.y + 6, 'station_top').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(t.y + 6);
+    const base = this.scene.add.image(b.x, b.y - 2, ATLAS, 'station').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(b.y + 1);
+    const top = this.scene.add.image(t.x, t.y + 6, ATLAS, 'station_top').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(t.y + 6);
     this.statics.push(base, top);
     if (!this.labels.has(l.id)) {
       const lb = this.scene.add.text(b.x, b.y - 58, '', { fontFamily: 'system-ui, sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ffffff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000);
@@ -72,7 +85,7 @@ export class LiftView {
 
   private carrier(i: number) {
     let c = this.carriers[i];
-    if (!c) { c = this.scene.add.image(0, 0, 'carrier_dot').setDepth(4000); this.carriers[i] = c; }
+    if (!c) { c = this.scene.add.image(0, 0, ATLAS, 'carrier_dot').setDepth(4000); this.carriers[i] = c; }
     return c;
   }
 
@@ -91,7 +104,7 @@ export class LiftView {
         if (u < 0 || u > 1) continue;
         const c = this.carrier(n++);
         const x = f.x + 5 + (e.x - f.x) * u, y = f.y + (e.y - f.y) * u;
-        c.setTexture(key).setOrigin(0.5, 0).setPosition(x, y).setScale(sc).setVisible(true);
+        c.setFrame(key).setOrigin(0.5, 0).setPosition(x, y).setScale(sc).setVisible(true);
         const hang = key === 'carrier_cabin' ? 12 : key === 'carrier_chair' ? 10 : 6;
         this.dots.fillStyle(0xffffff, 1);
         for (let k = 0; k < Math.min(d.n, 12); k++) {
@@ -105,7 +118,7 @@ export class LiftView {
       for (let k = 0; k < m; k++) {
         const u = 1 - ((k / m + now / rt) % 1);
         const c = this.carrier(n++);
-        c.setTexture(key).setOrigin(0.5, 0).setPosition(f.x - 5 + (e.x - f.x) * u, f.y + (e.y - f.y) * u).setScale(sc * 0.95).setVisible(true);
+        c.setFrame(key).setOrigin(0.5, 0).setPosition(f.x - 5 + (e.x - f.x) * u, f.y + (e.y - f.y) * u).setScale(sc * 0.95).setVisible(true);
       }
       const lb = this.labels.get(l.id);
       if (lb) {
@@ -115,6 +128,7 @@ export class LiftView {
       }
     }
     for (let i = n; i < this.carriers.length; i++) this.carriers[i].setVisible(false);
+    if (this.bridgeCabin) this.bridgeCabin.x = 600 + Math.sin(now / 9) * 400;
     const pulse = 1 + Math.sin(time * 3) * 0.08;
     for (const p of this.plus) p.img.setScale(1.9 / S * pulse);
     void S;

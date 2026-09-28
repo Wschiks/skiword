@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import { BUS_STOP, LODGE_POS, PARKING_POS, ROAD_Y } from '../config/layout';
-import { S } from './art';
+import { ATLAS, S } from './art';
 import type { GameState } from '../core/game';
 import { counts } from '../core/guests';
 
 export class BusView {
   private bus: Phaser.GameObjects.Image;
   constructor(scene: Phaser.Scene) {
-    scene.add.image(BUS_STOP.x + 96, ROAD_Y - 22, 'busstop').setOrigin(0.5, 1).setScale(1.1 / S).setDepth(ROAD_Y - 22);
-    this.bus = scene.add.image(-200, ROAD_Y + 12, 'bus').setOrigin(0.5, 1).setScale(1.1 / S).setDepth(3400).setVisible(false);
+    scene.add.image(BUS_STOP.x + 96, ROAD_Y - 22, ATLAS, 'busstop').setOrigin(0.5, 1).setScale(1.1 / S).setDepth(ROAD_Y - 22);
+    this.bus = scene.add.image(-200, ROAD_Y + 12, ATLAS, 'bus').setOrigin(0.5, 1).setScale(1.1 / S).setDepth(3400).setVisible(false);
   }
   update(s: GameState) {
     const t = s.rt.time + s.rt.acc - s.rt.busT0;
@@ -28,11 +28,11 @@ export class VillageView {
   private label: Phaser.GameObjects.Text;
   private shown = 0;
   constructor(private scene: Phaser.Scene) {
-    this.lodge = scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, 'lodge').setOrigin(0.5, 1).setScale(1 / S).setDepth(LODGE_POS.y + 12);
+    this.lodge = scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, ATLAS, 'lodge').setOrigin(0.5, 1).setScale(1 / S).setDepth(LODGE_POS.y + 12);
     for (let i = 0; i < 60; i++) {
       const col = i % 10, row = Math.floor(i / 10);
       const x = PARKING_POS.x - 126 + 14 + col * 28, y = PARKING_POS.y - 112 + 20 + row * 25;
-      const c = scene.add.image(x, y, `car_${(i * 7) % 4}`).setOrigin(0.5, 1).setScale(0.62 / S).setDepth(y).setVisible(false);
+      const c = scene.add.image(x, y, ATLAS, `car_${(i * 7) % 4}`).setOrigin(0.5, 1).setScale(0.62 / S).setDepth(y).setVisible(false);
       this.cars.push(c);
     }
     this.label = scene.add.text(PARKING_POS.x, PARKING_POS.y + 44, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(5000);

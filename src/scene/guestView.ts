@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { ZONES } from '../config/zones';
 import { BUILDINGS } from '../config/facilities';
 import { LODGE_POS, hub } from '../config/layout';
-import { S, guestKey } from './art';
+import { ATLAS, S, guestKey } from './art';
 import { SKI_SWAY, pisteCurve } from './background';
 import type { GameState, Guest } from '../core/game';
 import { areaIndex } from '../config/areas';
@@ -76,7 +76,7 @@ export class GuestView {
   private img(i: number) {
     let im = this.pool[i];
     if (!im) {
-      im = this.scene.add.image(0, 0, 'guests', guestKey('ski', 0, 0)).setOrigin(0.5, 1).setScale(1 / S);
+      im = this.scene.add.image(0, 0, ATLAS, guestKey('ski', 0, 0)).setOrigin(0.5, 1).setScale(1 / S);
       this.pool[i] = im;
     }
     return im;
@@ -98,7 +98,7 @@ export class GuestView {
       im.setVisible(true);
       if (g.angry && g.state === 'leaving') {
         let b = this.badges[nb];
-        if (!b) { b = this.scene.add.image(0, 0, 'frown').setScale(1 / S * 1.1); this.badges[nb] = b; }
+        if (!b) { b = this.scene.add.image(0, 0, ATLAS, 'frown').setScale(1 / S * 1.1); this.badges[nb] = b; }
         b.setPosition(p.x, p.y - 34).setDepth(p.y + 2).setVisible(true);
         nb++;
       }

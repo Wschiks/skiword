@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { formatMoney } from '../ui/format';
+import { ATLAS } from './art';
 
 interface Float { text: Phaser.GameObjects.Text; t: number; x: number; y: number; on: boolean }
 
@@ -16,7 +17,7 @@ export class Fx {
       this.floats.push({ text: t, t: 0, x: 0, y: 0, on: false });
     }
     for (let i = 0; i < 60; i++) {
-      const img = scene.add.image(0, 0, 'flake').setScrollFactor(0).setDepth(9000).setAlpha(0.85);
+      const img = scene.add.image(0, 0, ATLAS, 'flake').setScrollFactor(0).setDepth(9000).setAlpha(0.85);
       this.flakes.push({ img, x: Math.random(), y: Math.random(), v: 0.03 + Math.random() * 0.05, sw: 0.01 + Math.random() * 0.02, ph: Math.random() * 6.28 });
     }
   }

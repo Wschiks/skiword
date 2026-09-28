@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { AdMob } from '@capacitor-community/admob';
 import { AD_UNITS, LIVE, MOCK_AD_DELAY_MS } from './config/ads';
 
 export interface AdsService { isReady(): boolean; showRewarded(): Promise<boolean>; readonly name: string }
@@ -21,44 +23,35 @@ class MockAds implements AdsService {
 class NativeAds implements AdsService {
   name = 'admob';
   private ready = false;
-  private plugin: any;
-  constructor(plugin: any, private platform: 'android' | 'ios') {
-    this.plugin = plugin;
-    this.init();
-  }
+  constructor(private platform: 'android' | 'ios') { void this.init(); }
   private unit() { const u = AD_UNITS[this.platform]; return LIVE ? u.live : u.test; }
   private async init() {
     try {
-      await this.plugin.initialize({ initializeForTesting: !LIVE });
+      await AdMob.initialize({ initializeForTesting: !LIVE });
       await this.preload();
     } catch { this.ready = false; }
   }
   private async preload() {
-    try { await this.plugin.prepareRewardVideoAd({ adId: this.unit(), isTesting: !LIVE }); this.ready = true; } catch { this.ready = false; }
+    try { await AdMob.prepareRewardVideoAd({ adId: this.unit(), isTesting: !LIVE }); this.ready = true; } catch { this.ready = false; }
   }
   isReady() { return this.ready; }
   async showRewarded() {
     if (!this.ready) await this.preload();
     if (!this.ready) return false;
     try {
-      const r = await this.plugin.showRewardVideoAd();
+      const reward = await AdMob.showRewardVideoAd();
       this.ready = false;
       void this.preload();
-      return !!r;
+      return !!reward;
     } catch { this.ready = false; void this.preload(); return false; }
   }
 }
 
-const ADMOB_MODULE = '@capacitor-community/admob';
 export let ads: AdsService = new MockAds();
 
-/** Called at startup: swaps in the native implementation when running inside Capacitor with the AdMob plugin. */
+/** Called at startup: swaps in AdMob when running inside a Capacitor native shell. */
 export async function initAds() {
-  try {
-    const cap = (window as any).Capacitor;
-    if (!cap?.isNativePlatform?.()) return;
-    const platform = cap.getPlatform() as 'android' | 'ios';
-    const mod: any = await import(/* @vite-ignore */ ADMOB_MODULE).catch(() => null);
-    if (mod?.AdMob) ads = new NativeAds(mod.AdMob, platform);
-  } catch { /* stay on mock */ }
+  if (!Capacitor.isNativePlatform()) return;
+  const platform = Capacitor.getPlatform();
+  if (platform === 'android' || platform === 'ios') ads = new NativeAds(platform);
 }

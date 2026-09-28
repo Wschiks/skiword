@@ -9,13 +9,49 @@ export const GUEST_H = 28;
 
 type Draw = (c: CanvasRenderingContext2D) => void;
 
-export function bake(scene: Phaser.Scene, key: string, w: number, h: number, draw: Draw, scale = S) {
+export function bakeTexture(scene: Phaser.Scene, key: string, w: number, h: number, draw: Draw, scale = S) {
   if (scene.textures.exists(key)) scene.textures.remove(key);
   const tex = scene.textures.createCanvas(key, Math.ceil(w * scale), Math.ceil(h * scale))!;
   const c = tex.getContext();
   c.scale(scale, scale);
   draw(c);
   tex.refresh();
+}
+
+
+/**
+ * Shelf-packed texture atlas. Every sprite in the game lives in one texture ('atlas') so the whole
+ * depth-sorted scene (pines, rocks, lifts, buildings, guests) renders in about one batch.
+ */
+export const ATLAS = 'atlas';
+class Atlas {
+  private x = 2; private y = 2; private rowH = 0;
+  private frames: { key: string; x: number; y: number; w: number; h: number }[] = [];
+  private tex: Phaser.Textures.CanvasTexture;
+  private ctx: CanvasRenderingContext2D;
+  constructor(scene: Phaser.Scene, private W = 2048, private H = 1024) {
+    if (scene.textures.exists(ATLAS)) scene.textures.remove(ATLAS);
+    this.tex = scene.textures.createCanvas(ATLAS, W, H)!;
+    this.ctx = this.tex.getContext();
+  }
+  add(key: string, w: number, h: number, draw: Draw, scale = S) {
+    const pw = Math.ceil(w * scale), ph = Math.ceil(h * scale);
+    if (this.x + pw + 2 > this.W) { this.x = 2; this.y += this.rowH + 2; this.rowH = 0; }
+    if (this.y + ph + 2 > this.H) throw new Error(`atlas full at ${key}`);
+    const c = this.ctx;
+    c.save();
+    c.translate(this.x, this.y);
+    c.beginPath(); c.rect(0, 0, pw, ph); c.clip();
+    c.scale(scale, scale);
+    draw(c);
+    c.restore();
+    this.frames.push({ key, x: this.x, y: this.y, w: pw, h: ph });
+    this.x += pw + 2; this.rowH = Math.max(this.rowH, ph);
+  }
+  finish() {
+    this.tex.refresh();
+    for (const f of this.frames) this.tex.add(f.key, 0, f.x, f.y, f.w, f.h);
+  }
 }
 
 const rr = (c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
@@ -129,24 +165,12 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 void clamp;
 
 export function bakeAll(scene: Phaser.Scene) {
-  // guests: one atlas (12 sprites x 2 frames) so all guests batch into one draw call
-  {
-    const cw = 30, ch = GUEST_H + 1;
-    if (scene.textures.exists('guests')) scene.textures.remove('guests');
-    const tex = scene.textures.createCanvas('guests', cw * 12 * S, ch * 2 * S)!;
-    const c = tex.getContext();
-    c.scale(S, S);
-    for (let k = 0; k < 2; k++) for (let col = 0; col < 6; col++) for (let f = 0; f < 2; f++) {
-      c.save();
-      c.translate((k * 6 + col) * cw, f * ch);
-      c.beginPath(); c.rect(0, 0, cw, ch); c.clip();
-      drawGuest(c, k === 0 ? 'ski' : 'board', (k === 0 ? SKI_COLORS : BOARD_COLORS)[col], f, col + k * 2);
-      c.restore();
-    }
-    tex.refresh();
-    for (let k = 0; k < 2; k++) for (let col = 0; col < 6; col++) for (let f = 0; f < 2; f++) {
-      tex.add(guestKey(k === 0 ? 'ski' : 'board', col, f), 0, (k * 6 + col) * cw * S, f * ch * S, cw * S, ch * S);
-    }
+  const atlas = new Atlas(scene);
+  const bake = (_s: Phaser.Scene, key: string, w: number, h: number, draw: Draw, scale = S) => atlas.add(key, w, h, draw, scale);
+  // guests (12 looks x 2 frames)
+  for (let k = 0; k < 2; k++) for (let col = 0; col < 6; col++) for (let f = 0; f < 2; f++) {
+    const kind = k === 0 ? 'ski' : 'board';
+    bake(scene, guestKey(kind, col, f), 30, GUEST_H + 1, c => drawGuest(c, kind, (k === 0 ? SKI_COLORS : BOARD_COLORS)[col], f, col + k * 2));
   }
   // trees and rocks
   bake(scene, 'pine_s', 22, 30, c => pine(c, 22, 30, 0));
@@ -281,4 +305,5 @@ export function bakeAll(scene: Phaser.Scene) {
   bake(scene, 'flake', 6, 6, c => { c.fillStyle = 'rgba(255,255,255,0.95)'; c.beginPath(); c.arc(3, 3, 2.4, 0, 6.3); c.fill(); }, 2);
   bake(scene, 'dot', 4, 4, c => { c.fillStyle = '#fff'; c.beginPath(); c.arc(2, 2, 2, 0, 6.3); c.fill(); }, 2);
   bake(scene, 'ring', 64, 64, c => { c.strokeStyle = '#FF6B3D'; c.lineWidth = 3; c.beginPath(); c.arc(32, 32, 28, 0, 6.3); c.stroke(); }, 2);
+  atlas.finish();
 }

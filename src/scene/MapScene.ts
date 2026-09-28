@@ -3,7 +3,7 @@ import { AREAS } from '../config/areas';
 import { WORLD, hub, slotBase, slotTop } from '../config/layout';
 import { app } from '../app';
 import { advance, areaCost, parkingCapacity } from '../core/game';
-import { bakeAll, S } from './art';
+import { ATLAS, bakeAll, S } from './art';
 import { PisteLayer, bakeBackground, edgeL, placeDecor } from './background';
 import { MapView } from './MapView';
 import { GuestView } from './guestView';
@@ -82,7 +82,7 @@ export class MapScene extends Phaser.Scene {
     AREAS.forEach((a, i) => {
       const t = this.add.text(edgeL(a.band[0] + 40) + 60, a.band[0] + 22, a.name.toUpperCase(), { fontFamily: 'system-ui, sans-serif', fontSize: '40px', fontStyle: 'bold', color: '#ffffff', stroke: '#3b5675', strokeThickness: 7 }).setDepth(5100).setAlpha(0.92);
       this.areaLabels.push(t);
-      const sign = this.add.image(600, (a.band[0] + a.band[1]) / 2, 'forsale').setScale(2.2 / S).setDepth(5300).setVisible(false);
+      const sign = this.add.image(600, (a.band[0] + a.band[1]) / 2, ATLAS, 'forsale').setScale(2.2 / S).setDepth(5300).setVisible(false);
       this.signs.set(a.id, sign);
       const p = this.add.text(600, (a.band[0] + a.band[1]) / 2 + 95, '', { fontFamily: 'system-ui, sans-serif', fontSize: '46px', fontStyle: 'bold', color: '#ffffff', stroke: '#26384d', strokeThickness: 8 }).setOrigin(0.5).setDepth(5301).setVisible(false);
       this.priceLabels.set(a.id, p);
@@ -175,7 +175,7 @@ export class MapScene extends Phaser.Scene {
   /** highlight ring on the map (tutorial) */
   ring(x: number | null, y = 0, size = 90) {
     if (x === null) { this.hilite?.setVisible(false); return; }
-    if (!this.hilite) this.hilite = this.add.image(0, 0, 'ring').setDepth(7000);
+    if (!this.hilite) this.hilite = this.add.image(0, 0, ATLAS, 'ring').setDepth(7000);
     this.hilite.setVisible(true).setPosition(x, y).setScale(size / 32 / S * 2 * (1 + Math.sin(this.time.now / 200) * 0.08));
   }
 }
