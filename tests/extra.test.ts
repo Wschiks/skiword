@@ -105,3 +105,20 @@ describe('guest behaviour details', () => {
     step(s);
   });
 });
+
+import { bulkInfo } from '../src/ui/util';
+describe('bulk purchase preview (x1 / x10 / Max)', () => {
+  const cost = (L: number) => 10 * Math.pow(2, L);
+  it('x1 costs the next level, x10 sums ten, capped by the max level', () => {
+    expect(bulkInfo(0, 10, 1, 0, cost)).toEqual({ n: 1, total: 10 });
+    expect(bulkInfo(0, 10, 10, 0, cost).n).toBe(10);
+    expect(bulkInfo(0, 10, 10, 0, cost).total).toBe(10 * (Math.pow(2, 10) - 1));
+    expect(bulkInfo(8, 10, 10, 0, cost).n).toBe(2);
+    expect(bulkInfo(10, 10, 1, 1e9, cost)).toEqual({ n: 0, total: 0 });
+  });
+  it('Max buys as many as are affordable, at least one', () => {
+    expect(bulkInfo(0, 10, 'max', 70, cost)).toEqual({ n: 3, total: 70 }); // 10 + 20 + 40
+    expect(bulkInfo(0, 10, 'max', 5, cost)).toEqual({ n: 1, total: 10 }); // cannot afford: shows the price of one
+    expect(bulkInfo(0, 3, 'max', 1e9, cost).n).toBe(3);
+  });
+});
