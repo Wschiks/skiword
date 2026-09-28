@@ -1,0 +1,18 @@
+:root {
+  --snow: #F4F8FB; --ice: #DCEAF5; --shadow: #C2D3E3; --pine: #2F6B4F; --rock: #6D7A8C;
+  --sky: #8FC4E8; --accent: #FF6B3D; --accent2: #2E86DE; --gold: #F2B705; --danger: #D64545;
+  --text: #1E2A38; --panel: #FFFFFFEE; --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--sky); color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
+#app { position: fixed; inset: 0; }
+#game { position: absolute; inset: 0; }
+#game canvas { display: block; }
+#ui { position: absolute; inset: 0; pointer-events: none; }
+#splash { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(#4F8FD0, #CFE8F7); color: #fff; transition: opacity .5s; z-index: 100; }
+#splash.hide { opacity: 0; pointer-events: none; }
+.splash-title { font-size: 34px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.splash-sub { opacity: .85; }

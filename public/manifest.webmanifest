@@ -1,0 +1,10 @@
+{
+  "name": "Ski Idle Tycoon",
+  "short_name": "SkiTycoon",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#8FC4E8",
+  "theme_color": "#8FC4E8",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
