@@ -15,8 +15,8 @@ describe('balance bot playthrough (fast)', () => {
     // the last quest (New Season) needs prestige; everything before must be complete
     const undone = QUESTS.filter(q => !s.quests.doneIds.includes(q.id)).map(q => q.id);
     expect(undone).toEqual(['q26']);
-    expect(r.time / 3600).toBeGreaterThan(40);
-    expect(r.time / 3600).toBeLessThan(120);
+    expect(r.time / 3600).toBeGreaterThan(12); // fast variant
+    expect(r.time / 3600).toBeLessThan(45);
   });
   it('second run: New Season applies the bonus and the New Season quest completes', () => {
     const s = newGame(1);

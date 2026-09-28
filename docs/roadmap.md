@@ -24,5 +24,5 @@ Skill trees, resort reputation, weather, extra sports, cloud saves, leaderboards
 ## Alternative branches
 | Branch | What it changes |
 |---|---|
-| `option/fast-balance` | roughly 3x faster progression (about 25 h to everything maxed) for a more casual pace |
+| `option/fast-balance` | (this branch) about 3x faster progression: 24 h to everything maxed instead of 74 h, early game still paced |
 | `option/night-theme` | evening / night look for the map and a dark UI theme |

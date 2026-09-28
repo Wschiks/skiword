@@ -41,3 +41,6 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 
 ### M8 Native
 - Capacitor 8 projects for Android and iOS (SPM). AdMob (test ids, `LIVE=false`), native purchases, haptics, splash, status bar wired behind the existing services. Icons/splash generated from code (`npm run icons`). `cap sync` works. **Not compiled on this machine** (no Xcode / Android SDK), see `docs/native.md`.
+
+### Branch option/fast-balance
+- Only `src/config/balance.ts` (TUNE), `tests/playthrough.test.ts` bounds and docs differ from main. First attempt was a uniform 0.3x scale, rejected: T-Bar after 34 s and chair after 2.6 min makes the opening a blur. Final profile scales early costs 0.8-1.0x and late costs 0.3x. Result: T-Bar 3.2 min, first chair 11 min, Mid Mountain 20 min, first gondola 2 h, Glacier 4.7 h, everything maxed 23.9 h.

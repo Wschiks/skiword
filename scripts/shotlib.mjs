@@ -3,7 +3,9 @@ import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 
 export async function startServer(port = 5199) {
-  const proc = spawn('npx', ['vite', '--port', String(port), '--strictPort', '--host', '127.0.0.1'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  // SERVE=preview runs the tests against the production build (vite preview) instead of the dev server
+  const args = process.env.SERVE === 'preview' ? ['vite', 'preview', '--port', String(port), '--strictPort', '--host', '127.0.0.1'] : ['vite', '--port', String(port), '--strictPort', '--host', '127.0.0.1'];
+  const proc = spawn('npx', args, { stdio: ['ignore', 'pipe', 'pipe'] });
   await new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error('vite start timeout')), 30000);
     proc.stdout.on('data', d => { if (String(d).includes('Local')) { clearTimeout(t); resolve(); } });

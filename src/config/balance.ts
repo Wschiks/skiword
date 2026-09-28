@@ -26,9 +26,14 @@ export const AUTOSAVE_INTERVAL = 10;
  * The base tables in lifts/areas/... stay as the design source; these scale them.
  * `tier` has one entry per lift tier (1..10) and `area` one entry per area (bunny..glacier).
  */
+/**
+ * FAST variant: the opening keeps close to main's pace (a new player should still feel each early purchase),
+ * the mid and late game are compressed harder. Everything maxed in about a day instead of about three.
+ */
+const mul = (xs: number[], ks: number[]) => xs.map((x, i) => Number((x * ks[i]).toPrecision(3)));
 export const TUNE = {
-  parking: 1.39, housing: 1, slot: 1, building: 0.226, zone: 1,
-  liftLevel: [1, 1, 1, 1, 1, 1, 0.35, 0.35, 0.35, 0.35] as number[],
-  tier: [1, 1.18, 3.98, 4.18, 4.4, 4.74, 5.5, 4.4, 4.4, 4.6] as number[],
-  area: [1, 0.33, 0.4, 1.5, 1.4] as number[],
+  parking: 1.39 * 0.8, housing: 1 * 0.5, slot: 1 * 0.5, building: 0.226 * 0.5, zone: 1 * 0.4,
+  liftLevel: mul([1, 1, 1, 1, 1, 1, 0.35, 0.35, 0.35, 0.35], [0.8, 0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
+  tier: mul([1, 1.18, 3.98, 4.18, 4.4, 4.74, 5.5, 4.4, 4.4, 4.6], [1, 0.9, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3]),
+  area: mul([1, 0.33, 0.4, 1.5, 1.4], [1, 0.9, 0.6, 0.4, 0.3]),
 };
