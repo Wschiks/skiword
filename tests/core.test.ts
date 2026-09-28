@@ -3,7 +3,7 @@ import {
   newGame, step, simulate, advance, estimate, makeLine, buyLiftLevel, rebuildLine, buildLine, buyArea, buyParkingLevel,
   buyHousingLevel, buyBuilding, upgradeBuilding, buyZone, upgradeZone, nextParkStage, callSkiBus, computeOffline, claimOffline,
   busStatus, startNewSeason, canNewSeason, totalSeasonPoints, seasonBonus, ensureState, parkingCapacity, housingCapacity,
-  areaCost, tierBuildCost, levelUpgradeCost, zoneFee, checkQuests, claimQuest, activeQuests, rebuildRequirement, cashBundleAmount, buyCashBundle,
+  areaCost, tierBuildCost, slotCost, levelUpgradeCost, zoneFee, checkQuests, claimQuest, activeQuests, rebuildRequirement, cashBundleAmount, buyCashBundle,
 } from '../src/core/game';
 import { serialize, deserialize, saveState, loadState, SAVE_KEY } from '../src/core/save';
 import { makeGuest, chooseLine } from '../src/core/guests';
@@ -51,7 +51,7 @@ describe('buy rules', () => {
     expect(s.unlockedTier).toBe(3);
     const before = s.money;
     expect(buildLine(s, 'bunny', 1, 3).ok).toBe(true);
-    expect(before - s.money).toBeCloseTo(120 * 1 + tierBuildCost(3));
+    expect(before - s.money).toBeCloseTo(slotCost("bunny", 1) + tierBuildCost(3));
   });
   it('cannot build above unlocked tier; gondola-only slots need tier >= 7', () => {
     const s = rich();
