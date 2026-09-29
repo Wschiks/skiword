@@ -9,8 +9,16 @@ export const GUEST = {
   dayRides: [6, 9] as [number, number], busRides: 8, lodgeRides: [7, 10] as [number, number],
   lodgeSessions: 3, lodgeFactor: 1.25, restTime: 30,
   zoneRollWalk: 5, eatChance: 0.25, eatTime: 6,
-  skiJitter: [0.85, 1.15] as [number, number],
+  skiJitter: [0.85, 1.15] as [number, number], liftScoreJitter: 3,
 };
+
+/** Bottleneck hint (spec 14.6) and the population mood face */
+export const HINT = { angryWindow: 60, angryCount: 2, queueFill: 0.6, idleUtilisation: 0.5, idleAfter: 20 };
+export const MOOD = { angryWindow: 60, angryCount: 2, queueFill: 0.45 };
+/** UI visibility thresholds */
+export const UI = { busFabMaxGuests: 190, shopDotMaxGuests: 170, maxDpr: 2 };
+/** Constants of the analytic income estimate (spec 13.4), fitted against the full simulation */
+export const ESTIMATE = { fillBase: 0.9, fillExtra: 0.07, fillExtraCap: 100, walkOverhead: 8, softK: 5, priceWeightExp: 2 };
 
 export const WALK = { speed: 70, arrive: 8, hubStep: 10, toLift: 4, homeBase: 6, homePerArea: 6, toZone: 5 };
 

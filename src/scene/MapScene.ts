@@ -4,7 +4,7 @@ import { WORLD, slotBase, slotTop } from '../config/layout';
 import { app } from '../app';
 import { advance, areaCost, parkingCapacity } from '../core/game';
 import { ATLAS, bakeAll, S } from './art';
-import { PisteLayer, bakeBackground, edgeL, placeDecor } from './background';
+import { PisteLayer, bakeBackground, placeDecor } from './background';
 import { MapView } from './MapView';
 import { GuestView } from './guestView';
 import { LiftView, cableFrom, cableTo } from './liftView';
@@ -13,8 +13,7 @@ import { ZoneView } from './zoneView';
 import { BusView, VillageView } from './busView';
 import { Fx } from './fx';
 import { formatMoney } from '../ui/format';
-import { currentTheme } from '../config/theme';
-import { NightLayer } from './night';
+import { UI } from '../config/balance';
 
 export type MapHit =
   | { type: 'line'; id: string } | { type: 'slot'; areaId: string; slot: number }
@@ -42,8 +41,8 @@ export class MapScene extends Phaser.Scene {
     bakeAll(this);
     bakeBackground(this);
     this.add.image(0, 0, 'bg').setOrigin(0, 0).setDepth(-100);
-    this.add.rectangle(0, WORLD.h, WORLD.w * 3, 900, 0xc9d9e6).setOrigin(0.5, 0).setDepth(-101);
-    this.add.rectangle(0, -900, WORLD.w * 3, 900, 0x4f8fd0).setOrigin(0.5, 0).setDepth(-101);
+    this.add.rectangle(0, WORLD.h, WORLD.w * 3, 900, 0xdbe8f5).setOrigin(0.5, 0).setDepth(-101);
+    this.add.rectangle(0, -900, WORLD.w * 3, 900, 0xe2f0fb).setOrigin(0.5, 0).setDepth(-101);
     this.pistes = new PisteLayer(this);
     const decor = this.add.layer();
     placeDecor(this, decor);
@@ -65,7 +64,7 @@ export class MapScene extends Phaser.Scene {
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
     this.onResize();
-    if (!this.night) this.cameras.main.setBackgroundColor('#8FC4E8');
+    this.cameras.main.setBackgroundColor('#EAF3FB');
     app.on('focus', (f: { x: number; y: number; pan?: boolean; zoom?: number; burst?: number; yFrac?: number }) => {
       if (f.pan) this.mv.panTo(f.x, f.y, f.zoom, f.yFrac ?? 0.5);
       if (f.burst) this.fx.burst(f.x, f.y, f.burst);
@@ -77,7 +76,7 @@ export class MapScene extends Phaser.Scene {
     const host = document.getElementById('game')!;
     const w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
     if (!(w >= 50 && h >= 50)) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(UI.maxDpr, window.devicePixelRatio || 1);
     this.dprV = dpr;
     this.scale.setZoom(1 / dpr);
     this.scale.resize(Math.round(w * dpr), Math.round(h * dpr));
@@ -87,12 +86,12 @@ export class MapScene extends Phaser.Scene {
   }
 
   private makeAreaLabels() {
-    AREAS.forEach((a, i) => {
-      const t = this.add.text(edgeL(a.band[0] + 40) + 60, a.band[0] + 22, a.name.toUpperCase(), { fontFamily: 'system-ui, sans-serif', fontSize: '40px', fontStyle: 'bold', color: '#ffffff', stroke: '#3b5675', strokeThickness: 7 }).setDepth(5100).setAlpha(0.92);
+    AREAS.forEach(a => {
+      const t = this.add.text(50, a.band[0] + 30, a.name.toUpperCase(), { fontFamily: 'system-ui, sans-serif', fontSize: '34px', fontStyle: '800', color: '#ffffff', stroke: '#2F6FB8', strokeThickness: 8 }).setDepth(5100);
       this.areaLabels.push(t);
       const sign = this.add.image(600, (a.band[0] + a.band[1]) / 2, ATLAS, 'forsale').setScale(2.2 / S).setDepth(5300).setVisible(false);
       this.signs.set(a.id, sign);
-      const p = this.add.text(600, (a.band[0] + a.band[1]) / 2 + 95, '', { fontFamily: 'system-ui, sans-serif', fontSize: '46px', fontStyle: 'bold', color: '#ffffff', stroke: '#26384d', strokeThickness: 8 }).setOrigin(0.5).setDepth(5301).setVisible(false);
+      const p = this.add.text(600, (a.band[0] + a.band[1]) / 2 + 100, '', { fontFamily: 'system-ui, sans-serif', fontSize: '44px', fontStyle: '800', color: '#ffffff', stroke: '#1F7A3A', strokeThickness: 7, backgroundColor: '#3CCB63', padding: { x: 22, y: 8 } }).setOrigin(0.5).setDepth(5301).setVisible(false);
       this.priceLabels.set(a.id, p);
     });
   }
@@ -116,14 +115,15 @@ export class MapScene extends Phaser.Scene {
         if (owned) return;
         const isNext = next?.id === a.id;
         pl.setText(formatMoney(areaCost(a.id)));
-        pl.setColor(isNext ? '#ffe28a' : '#c9d3df');
-        this.locks.fillStyle(0x1e2f44, isNext ? 0.5 : 0.68);
+        pl.setColor('#ffffff').setBackgroundColor(isNext ? '#3CCB63' : '#8FA6C0');
         const [y0, y1] = a.band;
-        const pts: Phaser.Math.Vector2[] = [];
-        for (let y = y0; y <= y1; y += 40) pts.push(new Phaser.Math.Vector2(edgeL(y) + 24, y));
-        for (let y = y1; y >= y0; y -= 40) pts.push(new Phaser.Math.Vector2(WORLD.w - edgeL(y) - 24, y));
-        this.locks.fillPoints(pts, true);
-        });
+        // frosted fog over locked terrain: solid pale blue with cloud puffs along the top edge
+        this.locks.fillStyle(0xe4eef9, isNext ? 0.8 : 0.9);
+        this.locks.fillRect(0, y0, WORLD.w, y1 - y0);
+        for (let k = 0; k < 24; k++) this.locks.fillCircle(k * 52 + ((k * 37) % 30), y0 + ((k * 53) % 22) - 6, 34 + ((k * 19) % 22));
+        this.locks.fillStyle(0xc4d6ec, 0.35);
+        this.locks.fillRect(0, y1 - 26, WORLD.w, 26);
+      });
     }
   }
 

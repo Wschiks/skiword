@@ -1,5 +1,5 @@
 import { app } from '../app';
-import { OFFLINE } from '../config/balance';
+import { BUS, MOOD, OFFLINE, UI } from '../config/balance';
 import { AREAS, areaDef, areaIndex } from '../config/areas';
 import { BUILDINGS } from '../config/facilities';
 import { ZONES } from '../config/zones';
@@ -11,10 +11,12 @@ import {
   listPurchases, maxPop, nextGoal, seasonPreview, startNewSeason, queueCap,
 } from '../core/game';
 import { clearSave, saveState } from '../core/save';
+import { Capacitor } from '@capacitor/core';
+import { App as NativeApp } from '@capacitor/app';
 import { ads } from '../ads';
 import { purchases } from '../purchases';
 import { icons } from './icons';
-import { formatMoney, formatNum, formatRate, formatTime } from './format';
+import { formatMoney, formatNum, formatTime } from './format';
 import { sfx, haptic, initAudio, setSoundEnabled, setHapticsEnabled } from './sound';
 import { confetti } from './confetti';
 import { bar } from './util';
@@ -73,6 +75,15 @@ export function initUI() {
   setupSheetDrag();
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); else saveNow(); });
   window.addEventListener('pagehide', saveNow);
+  if (Capacitor.isNativePlatform()) {
+    // Android hardware Back: close the top-most dialog or sheet first, only then leave the game
+    void NativeApp.addListener('backButton', () => {
+      if (modalOpen && modalOpen !== 'offline') closeModal();
+      else if (open) closeSheet();
+      else void NativeApp.minimizeApp();
+    });
+    void NativeApp.addListener('pause', () => saveNow());
+  }
   setInterval(tick, 100);
   tick(true);
   setTimeout(() => showOfflineOnStart(), 400);
@@ -274,9 +285,9 @@ async function restore() {
 function showBusModal() {
   const s = app.state, st = busStatus(s);
   openModal(`<div class="modal-title">${icons.bus} Ski Bus</div>
-    <div class="modal-body">Bring <b>40 guests</b> right now. They ignore the parking limit and leave after their session.<div class="sub pad">Used today ${st.used}/12 &middot; you have ${s.gems} gems</div></div>
+    <div class="modal-body">Bring <b>${BUS.size} guests</b> right now. They ignore the parking limit and leave after their session.<div class="sub pad">Used today ${st.used}/${BUS.maxPerDay} &middot; you have ${s.gems} gems</div></div>
     <div class="btns col"><button class="btn primary${st.available && ads.isReady() ? '' : ' off'}" data-act="busad"${st.available && ads.isReady() ? '' : ' data-off="1"'}><span class="btn-l">${icons.play} Watch ad</span><span class="btn-c">Free</span></button>
-    <button class="btn blue${st.available && s.gems >= 12 ? '' : ' off'}" data-act="busgems"${st.available && s.gems >= 12 ? '' : ' data-off="1"'}><span class="btn-l">${icons.gem} Use gems</span><span class="btn-c">12</span></button>
+    <button class="btn blue${st.available && s.gems >= BUS.gemCost ? '' : ' off'}" data-act="busgems"${st.available && s.gems >= BUS.gemCost ? '' : ' data-off="1"'}><span class="btn-l">${icons.gem} Use gems</span><span class="btn-c">${BUS.gemCost}</span></button>
     <button class="btn ghost" data-act="dlg-close"><span class="btn-l">Not now</span></button></div>`, 'bus');
 }
 function showLegal(kind: string) {
@@ -369,11 +380,11 @@ function refreshCtx() {
 
 function mood(): 'good' | 'ok' | 'bad' {
   const s = app.state;
-  const recent = s.stats.angryRecent.filter(t => s.rt.time - t <= 60).length;
-  if (recent >= 2) return 'bad';
+  const recent = s.stats.angryRecent.filter(t => s.rt.time - t <= MOOD.angryWindow).length;
+  if (recent >= MOOD.angryCount) return 'bad';
   let fill = 0, n = 0;
   for (const l of s.lines) { fill += l.queue.length / queueCap(l); n++; }
-  return n && fill / n > 0.45 ? 'ok' : 'good';
+  return n && fill / n > MOOD.queueFill ? 'ok' : 'good';
 }
 
 function tabDots(): Record<string, boolean> {
@@ -387,7 +398,7 @@ function tabDots(): Record<string, boolean> {
     mountain: aff(['area']),
     buildings: aff(['building', 'buildingUp']),
     zones: aff(['zone', 'zoneUp', 'stage']),
-    shop: busStatus(s).available && s.rt.guests.length < 170,
+    shop: busStatus(s).available && s.rt.guests.length < UI.shopDotMaxGuests,
   };
 }
 
@@ -396,10 +407,11 @@ function tick(force = false) {
   refreshCtx();
   const s = app.state;
   // top bar every tick
-  setHTML($('topbar'), `<div class="tb-money" id="money">${icons.coin}<div><div class="tb-amt">${formatMoney(s.money)}</div><div class="tb-rate">${formatRate(s.incomeEma)}</div></div></div>
-    <div class="tb-pills"><div class="pill gems">${icons.gem}<b>${formatNum(s.gems)}</b></div>
-    <div class="pill pop-pill">${icons.people}<b>${s.rt.guests.length}<span>/${maxPop(s)}</span></b>${icons.face(mood())}</div></div>
-    <button class="icon-btn menu-btn" data-act="tab" data-a="menu" aria-label="Menu">${icons.gear}</button>`);
+  setHTML($('topbar'), `<div class="tb-left"><div class="tb-rate">${formatMoney(s.incomeEma * 60)}/min</div>
+      <div class="cash-pill tb-money" id="money"><i class="coin-badge">${icons.coin}</i><b class="tb-amt">${formatMoney(s.money)}</b></div></div>
+    <div class="tb-right"><div class="gem-pill">${icons.gem}<b>${formatNum(s.gems)}</b></div>
+      <div class="pop-pill">${icons.people}<b>${s.rt.guests.length}<span>/${maxPop(s)}</span></b>${icons.face(mood())}</div></div>
+    <button class="sq-btn menu-btn" data-act="tab" data-a="menu" aria-label="Menu">${icons.gear}</button>`);
   const now = performance.now();
   if (force || now - last250 > 250) { last250 = now; renderAll(false); }
   // map ring for tutorial
@@ -426,7 +438,7 @@ function renderAll(immediate: boolean) {
   setHTML($('next'), g ? `<div class="next-t"><span class="next-l">Next</span><span class="next-n">${g.label}</span></div><div class="next-c">${formatMoney(g.cost)}</div>${bar(s.money / Math.max(1, g.cost), s.money >= g.cost ? 'ready' : '')}` : '<div class="next-t"><span class="next-n">Everything built</span></div>');
   $('next').classList.toggle('hidden', !g);
   const bus = busStatus(s);
-  $('busfab').classList.toggle('hidden', !(bus.available && (s.tutorial.done || s.tutorial.step >= 5) && s.rt.guests.length < 190));
+  $('busfab').classList.toggle('hidden', !(bus.available && (s.tutorial.done || s.tutorial.step >= 5) && s.rt.guests.length < UI.busFabMaxGuests));
   // tabs
   const dots = tabDots();
   for (const tb of TABS) {
@@ -437,7 +449,7 @@ function renderAll(immediate: boolean) {
     el.classList.toggle('pulse', tpulse === tb.id && open !== tb.id);
   }
   // let the camera scroll the map above an open sheet (and make room for purchase glides)
-  if (scene) scene.mv.padBottom = open ? $('sheet').offsetHeight + 60 : 96;
+  if (scene) scene.mv.padBottom = open ? $('sheet').offsetHeight + 86 : 110;
   // sheet
   if (open) {
     $('sheet-title').textContent = TITLES[open];

@@ -106,7 +106,7 @@ export function chooseLine(s: GameState, g: Guest): Line | null {
   for (const l of s.lines) {
     if (l.queue.length >= queueCap(l)) continue;
     const wait = Math.ceil((l.queue.length + 1) / lineCapacity(l)) * lineInterval(l);
-    const score = wait + hubWalk(g.area, areaIndex(l.areaId)) + rnd(s) * 3;
+    const score = wait + hubWalk(g.area, areaIndex(l.areaId)) + rnd(s) * GUEST.liftScoreJitter;
     if (score < bestScore) { bestScore = score; best = l; }
   }
   return best;

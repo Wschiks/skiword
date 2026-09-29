@@ -1,11 +1,12 @@
 import { AREAS, areaDef } from '../config/areas';
-import { LEVEL_MAX, LIFT_TIERS, MAX_TIER } from '../config/lifts';
+import { LEVEL_MAX, LIFT_TIERS, MAX_TIER, REQ_LEVEL_GATE } from '../config/lifts';
 import type { Count } from '../core/unlocks';
 import {
   buildLine, buyLiftLevel, rebuildLine, rebuildRequirement, tierDef, tierBuildCost, levelUpgradeCost, newLineCost, lineInterval,
   ticketPrice, lineCapacity, queueCap, areaOwned, canBuildLine,
 } from '../core/game';
 import { GATE_TIERS } from '../config/lifts';
+import { HINT } from '../config/balance';
 import type { Ctx } from './types';
 import { icons } from './icons';
 import { formatMoney, formatRate } from './format';
@@ -33,7 +34,7 @@ export function render(c: Ctx): string {
         <div class="row"><div class="ico tier-${tdef.family}">${famIcon(l.tier)}</div>
           <div class="grow"><div class="title">${tdef.name} <span class="muted">Tier ${l.tier}</span></div>
           <div class="sub">Level ${l.level}/${LEVEL_MAX} &middot; <b>${formatRate(l.incomeRate)}</b></div></div>
-          <div class="qbox ${l.queue.length / queueCap(l) > 0.6 ? 'hot' : ''}">Queue<b>${l.queue.length}/${queueCap(l)}</b></div></div>
+          <div class="qbox ${l.queue.length / queueCap(l) > HINT.queueFill ? 'hot' : ''}">Queue<b>${l.queue.length}/${queueCap(l)}</b></div></div>
         ${dots(l.level)}
         <div class="stats"><div>People / ride<b>${lineCapacity(l)}</b></div><div>Every<b>${lineInterval(l).toFixed(2)}s</b></div><div>Per ride<b>${formatMoney(ticketPrice(l))}</b></div></div>
         <div class="btns">
@@ -65,7 +66,7 @@ function emptySlot(c: Ctx, areaId: string, slot: number): string {
       const cost = newLineCost(areaId, slot, t.tier);
       html += `<div class="pick-row"><div class="grow"><b>${t.name}</b><span class="muted"> ${t.capacity}/ride &middot; ${formatMoney(t.price)}</span></div>${btn({ act: 'build', a: key, b: String(t.tier), label: 'Build', cost, money: s.money, off: !canBuildLine(s, areaId, slot, t.tier).ok && s.money >= cost })}</div>`;
     }
-    if (!any) html += `<div class="muted pad">Unlock gondolas first: rebuild a Chair Lift 8 to level 8, then rebuild it into a gondola.</div>`;
+    if (!any) html += `<div class="muted pad">Unlock gondolas first: rebuild a top chair lift at level ${REQ_LEVEL_GATE}, then rebuild it into a gondola.</div>`;
     html += `</div>`;
   }
   return html + `</div>`;

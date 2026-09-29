@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+import { LOT } from './background';
 import { BUS_STOP, LODGE_POS, PARKING_POS, ROAD_Y } from '../config/layout';
-import { ATLAS, S } from './art';
+import { ATLAS, CAR_VARIANTS, S } from './art';
 import type { GameState } from '../core/game';
 import { counts } from '../core/guests';
 
@@ -27,14 +28,14 @@ export class VillageView {
   private label: Phaser.GameObjects.Text;
   private shown = 0;
   constructor(scene: Phaser.Scene) {
-    scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, ATLAS, 'lodge').setOrigin(0.5, 1).setScale(1 / S).setDepth(LODGE_POS.y + 12);
+    scene.add.image(LODGE_POS.x, LODGE_POS.y + 12, ATLAS, 'lodge').setOrigin(0.5, 1).setScale(1.15 / S).setDepth(LODGE_POS.y + 12);
     for (let i = 0; i < 60; i++) {
       const col = i % 10, row = Math.floor(i / 10);
-      const x = PARKING_POS.x - 126 + 14 + col * 28, y = PARKING_POS.y - 112 + 20 + row * 25;
-      const c = scene.add.image(x, y, ATLAS, `car_${(i * 7) % 4}`).setOrigin(0.5, 1).setScale(0.62 / S).setDepth(y).setVisible(false);
+      const x = LOT.x0 + 6 + 14 + col * 28, y = LOT.y0 + 6 + 27 * (row + 1);
+      const c = scene.add.image(x, y, ATLAS, `car_${(i * 5) % CAR_VARIANTS}`).setOrigin(0.5, 1).setScale(0.98 / S).setDepth(y).setVisible(false);
       this.cars.push(c);
     }
-    this.label = scene.add.text(PARKING_POS.x, PARKING_POS.y + 44, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(5000);
+    this.label = scene.add.text(PARKING_POS.x, LOT.y0 + LOT.h + 14, '', { fontFamily: 'system-ui, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#fff', stroke: '#2F5F9E', strokeThickness: 5 }).setOrigin(0.5, 0).setDepth(5000);
   }
   update(s: GameState, parkingCap: number, zoomRel: number) {
     const c = counts(s);
@@ -45,5 +46,5 @@ export class VillageView {
     this.label.setVisible(zoomRel > 0.9).setScale(Math.min(1.3, 1.2 / zoomRel * 1.2));
   }
   hitParking(wx: number, wy: number) { return wx < PARKING_POS.x + 170 && wx > PARKING_POS.x - 140 && wy > PARKING_POS.y - 130 && wy < PARKING_POS.y + 60; }
-  hitLodge(wx: number, wy: number) { return wx > LODGE_POS.x - 105 && wx < LODGE_POS.x + 105 && wy > LODGE_POS.y - 125 && wy < LODGE_POS.y + 20; }
+  hitLodge(wx: number, wy: number) { return wx > LODGE_POS.x - 118 && wx < LODGE_POS.x + 118 && wy > LODGE_POS.y - 150 && wy < LODGE_POS.y + 20; }
 }
