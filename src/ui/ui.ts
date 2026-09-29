@@ -1,5 +1,5 @@
 import { app } from '../app';
-import { OFFLINE } from '../config/balance';
+import { BUS, MOOD, OFFLINE, UI } from '../config/balance';
 import { AREAS, areaDef, areaIndex } from '../config/areas';
 import { BUILDINGS } from '../config/facilities';
 import { ZONES } from '../config/zones';
@@ -285,9 +285,9 @@ async function restore() {
 function showBusModal() {
   const s = app.state, st = busStatus(s);
   openModal(`<div class="modal-title">${icons.bus} Ski Bus</div>
-    <div class="modal-body">Bring <b>40 guests</b> right now. They ignore the parking limit and leave after their session.<div class="sub pad">Used today ${st.used}/12 &middot; you have ${s.gems} gems</div></div>
+    <div class="modal-body">Bring <b>${BUS.size} guests</b> right now. They ignore the parking limit and leave after their session.<div class="sub pad">Used today ${st.used}/${BUS.maxPerDay} &middot; you have ${s.gems} gems</div></div>
     <div class="btns col"><button class="btn primary${st.available && ads.isReady() ? '' : ' off'}" data-act="busad"${st.available && ads.isReady() ? '' : ' data-off="1"'}><span class="btn-l">${icons.play} Watch ad</span><span class="btn-c">Free</span></button>
-    <button class="btn blue${st.available && s.gems >= 12 ? '' : ' off'}" data-act="busgems"${st.available && s.gems >= 12 ? '' : ' data-off="1"'}><span class="btn-l">${icons.gem} Use gems</span><span class="btn-c">12</span></button>
+    <button class="btn blue${st.available && s.gems >= BUS.gemCost ? '' : ' off'}" data-act="busgems"${st.available && s.gems >= BUS.gemCost ? '' : ' data-off="1"'}><span class="btn-l">${icons.gem} Use gems</span><span class="btn-c">${BUS.gemCost}</span></button>
     <button class="btn ghost" data-act="dlg-close"><span class="btn-l">Not now</span></button></div>`, 'bus');
 }
 function showLegal(kind: string) {
@@ -380,11 +380,11 @@ function refreshCtx() {
 
 function mood(): 'good' | 'ok' | 'bad' {
   const s = app.state;
-  const recent = s.stats.angryRecent.filter(t => s.rt.time - t <= 60).length;
-  if (recent >= 2) return 'bad';
+  const recent = s.stats.angryRecent.filter(t => s.rt.time - t <= MOOD.angryWindow).length;
+  if (recent >= MOOD.angryCount) return 'bad';
   let fill = 0, n = 0;
   for (const l of s.lines) { fill += l.queue.length / queueCap(l); n++; }
-  return n && fill / n > 0.45 ? 'ok' : 'good';
+  return n && fill / n > MOOD.queueFill ? 'ok' : 'good';
 }
 
 function tabDots(): Record<string, boolean> {
@@ -398,7 +398,7 @@ function tabDots(): Record<string, boolean> {
     mountain: aff(['area']),
     buildings: aff(['building', 'buildingUp']),
     zones: aff(['zone', 'zoneUp', 'stage']),
-    shop: busStatus(s).available && s.rt.guests.length < 170,
+    shop: busStatus(s).available && s.rt.guests.length < UI.shopDotMaxGuests,
   };
 }
 
@@ -437,7 +437,7 @@ function renderAll(immediate: boolean) {
   setHTML($('next'), g ? `<div class="next-t"><span class="next-l">Next</span><span class="next-n">${g.label}</span></div><div class="next-c">${formatMoney(g.cost)}</div>${bar(s.money / Math.max(1, g.cost), s.money >= g.cost ? 'ready' : '')}` : '<div class="next-t"><span class="next-n">Everything built</span></div>');
   $('next').classList.toggle('hidden', !g);
   const bus = busStatus(s);
-  $('busfab').classList.toggle('hidden', !(bus.available && (s.tutorial.done || s.tutorial.step >= 5) && s.rt.guests.length < 190));
+  $('busfab').classList.toggle('hidden', !(bus.available && (s.tutorial.done || s.tutorial.step >= 5) && s.rt.guests.length < UI.busFabMaxGuests));
   // tabs
   const dots = tabDots();
   for (const tb of TABS) {

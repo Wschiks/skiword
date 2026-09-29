@@ -1,14 +1,16 @@
 import { APP_NAME, APP_VERSION, CREDITS, PRIVACY, PUBLISHER, TERMS } from '../config/legal';
 import { canNewSeason, seasonPreview, seasonBonus } from '../core/game';
+import { GUEST } from '../config/balance';
+import { REQ_LEVEL_GATE, REQ_LEVEL_NORMAL } from '../config/lifts';
 import type { Ctx } from './types';
 import { icons } from './icons';
 import { formatMoney, formatNum } from './format';
 
 export const HELP = [
   ['Guests pay per ride', 'Every guest pays each time they board a lift, not once per visit. Upgrade lifts to earn more per ride and carry more people.'],
-  ['Queues and patience', 'Guests wait about 50 seconds. Then they walk to their car angry and you lose those rides. Long queues mean your lifts are the bottleneck.'],
+  ['Queues and patience', `Guests wait about ${GUEST.patience} seconds. Then they walk to their car angry and you lose those rides. Long queues mean your lifts are the bottleneck.`],
   ['People, lifts, terrain', 'Income is limited by how many guests you have (parking, housing, ski bus), how fast your lifts move them, and how much mountain you own.'],
-  ['Rebuild lifts', 'A lift can be rebuilt into the next tier once it reaches level 3. The jumps from T-Bar to chairs and from chairs to gondolas need level 8.'],
+  ['Rebuild lifts', `A lift can be rebuilt into the next tier once it reaches level ${REQ_LEVEL_NORMAL}. The jumps from T-Bar to chairs and from chairs to gondolas need level ${REQ_LEVEL_GATE}.`],
   ['Passive income', 'Restaurants and bars earn on their own. Zones charge guests a fee each time they enter. Both grow with more guests.'],
   ['New Season', 'Own the whole mountain and start over for permanent bonus income (Season Points). Gems, quests and settings stay.'],
 ];

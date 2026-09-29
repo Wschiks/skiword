@@ -1,4 +1,5 @@
 import { HOUSING, PARKING } from '../config/capacity';
+import { GUEST } from '../config/balance';
 import type { Count } from '../core/unlocks';
 import {
   areaOwned, buyHousingLevel, buyParkingLevel, housingCapacity, housingCapacityAt, housingCost, parkingCapacity, parkingCapacityAt, parkingCost,
@@ -25,7 +26,7 @@ export function render(c: Ctx): string {
   const hb = bulkInfo(s.housingLevel, HOUSING.levelMax, c.mult, s.money, L => housingCost(L));
   const hNext = housingCapacityAt(Math.min(HOUSING.levelMax, s.housingLevel + hb.n));
   html += `<div class="card${unlocked ? '' : ' locked'}"><div class="row"><div class="ico">${icons.bed}</div><div class="grow"><div class="title">Housing</div>
-    <div class="sub">Overnight guests stay 3 sessions and pay 1.25x. Level ${s.housingLevel}/${HOUSING.levelMax}</div></div><div class="qbox">Beds<b>${cnt.lodge}/${housingCapacity(s)}</b></div></div>
+    <div class="sub">Overnight guests stay ${GUEST.lodgeSessions} sessions and pay ${GUEST.lodgeFactor}x. Level ${s.housingLevel}/${HOUSING.levelMax}</div></div><div class="qbox">Beds<b>${cnt.lodge}/${housingCapacity(s)}</b></div></div>
     ${unlocked ? `${bar(cnt.lodge / Math.max(1, housingCapacity(s)))}
     <div class="stats"><div>Beds now<b>${housingCapacity(s)}</b></div><div>After buying<b>${s.housingLevel >= HOUSING.levelMax ? 'max' : hNext}</b></div></div>
     <div class="btns">${s.housingLevel >= HOUSING.levelMax ? '<div class="maxed">Max housing</div>' : btn({ act: 'housing', label: `More beds${hb.n > 1 ? ` +${hb.n}` : ''}`, cost: hb.total, money: s.money })}</div>`

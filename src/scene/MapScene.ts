@@ -13,6 +13,7 @@ import { ZoneView } from './zoneView';
 import { BusView, VillageView } from './busView';
 import { Fx } from './fx';
 import { formatMoney } from '../ui/format';
+import { UI } from '../config/balance';
 
 export type MapHit =
   | { type: 'line'; id: string } | { type: 'slot'; areaId: string; slot: number }
@@ -73,7 +74,7 @@ export class MapScene extends Phaser.Scene {
     const host = document.getElementById('game')!;
     const w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
     if (!(w >= 50 && h >= 50)) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = Math.min(UI.maxDpr, window.devicePixelRatio || 1);
     this.dprV = dpr;
     this.scale.setZoom(1 / dpr);
     this.scale.resize(Math.round(w * dpr), Math.round(h * dpr));
