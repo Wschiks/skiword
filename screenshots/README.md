@@ -14,3 +14,5 @@ If you spot something in an early folder that was later removed or changed, the 
 | `m7-art-tour` | `m7-m8-polish-native` | Close-up of every zone, building, the park's 3 stages, lodge, parking and the ski bus with everything unlocked. Found the zone/lift overlap and the horizontal-pan bug |
 | `final` | latest `main` | Regenerated full set from the final code: fresh start, early, mid, late, HUD, all sheets, menu with the new Stats card |
 | `m7-focus` | `main` | Buying a new area: sheet closes, camera glides to the new territory, ring + glow burst and "Unlocked" toast (`buy-area-before-sheet`, `buy-area-burst`, `buy-area-after-glide`) |
+| `restyle-v1` .. `restyle-v4` | `main` | Iterations of the chunky cartoon restyle. v1 = map only, v2 = HUD restyle, v3 = spacing, v4 = continuous border fences. Compare with `final/` (old look, tag `v1-classic-look`) |
+| `restyle-art-tour` | `main` | Close-ups of the new art |

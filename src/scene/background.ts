@@ -3,128 +3,97 @@ import { AREAS, CANYON_BAND } from '../config/areas';
 import { BUILDINGS } from '../config/facilities';
 import { ZONES } from '../config/zones';
 import { LODGE_POS, PARKING_POS, ROAD_Y, WORLD, hub, slotBase, slotTop } from '../config/layout';
-import { ATLAS, bakeTexture } from './art';
+import { ATLAS, S, bakeTexture } from './art';
 import { mulberry32 } from './rand';
 
-/** left edge of the mountain silhouette at world y (right edge is mirrored) */
+/** the snowfield fills the whole world width; trees line the left and right edges */
 export function edgeL(y: number): number {
-  const pts: [number, number][] = [[0, 250], [300, 170], [500, 120], [560, 100], [900, 70], [1300, 40], [1900, 10], [2400, -20], [3300, -40]];
-  for (let i = 0; i < pts.length - 1; i++) {
-    const [y0, x0] = pts[i], [y1, x1] = pts[i + 1];
-    if (y >= y0 && y <= y1) return x0 + ((x1 - x0) * (y - y0)) / (y1 - y0);
-  }
-  return -40;
+  return 14 + Math.sin(y * 0.011) * 7 + Math.sin(y * 0.037) * 3;
 }
 
-const SNOW = ['#F4F8FB', '#EEF5FB', '#E8F1F9', '#E1EDF7', '#D5EAF8'];
+export const LOT = { x0: PARKING_POS.x - 130, y0: 2944, w: 296, h: 178 };
 
 export function bakeBackground(scene: Phaser.Scene) {
   bakeTexture(scene, 'bg', WORLD.w, WORLD.h, c => {
     const rnd = mulberry32(42);
-    // sky
-    const sky = c.createLinearGradient(0, 0, 0, 2600);
-    sky.addColorStop(0, '#4F8FD0'); sky.addColorStop(0.45, '#8FC4E8'); sky.addColorStop(1, '#CFE8F7');
-    c.fillStyle = sky; c.fillRect(0, 0, WORLD.w, WORLD.h);
-    // soft clouds
-    for (let i = 0; i < 9; i++) {
-      const cx = rnd() * 1200, cy = 40 + rnd() * 900, s = 0.7 + rnd() * 1.1;
-      c.fillStyle = 'rgba(255,255,255,0.55)';
-      for (let k = 0; k < 5; k++) { c.beginPath(); c.ellipse(cx + k * 24 * s - 48 * s, cy + (k % 2) * 6, 34 * s, 16 * s, 0, 0, 6.3); c.fill(); }
+    // ---- snowfield: near-white with a faint ice tint on the glacier
+    const base = c.createLinearGradient(0, 0, 0, WORLD.h);
+    base.addColorStop(0, '#E2F0FB'); base.addColorStop(0.16, '#EEF6FD'); base.addColorStop(0.19, '#FAFDFF'); base.addColorStop(0.9, '#FFFFFF'); base.addColorStop(1, '#F1F7FD');
+    c.fillStyle = base; c.fillRect(0, 0, WORLD.w, WORLD.h);
+    // ---- soft dunes: blue-grey shadow with a white highlight on top
+    for (let i = 0; i < 260; i++) {
+      const x = rnd() * 1200, y = 20 + rnd() * 2880, rx = 80 + rnd() * 240, ry = 18 + rnd() * 52;
+      if (y > 500 && y < 566) continue;
+      c.fillStyle = 'rgba(184,205,232,0.27)'; c.beginPath(); c.ellipse(x + 12, y + 9, rx, ry, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = 'rgba(255,255,255,0.92)'; c.beginPath(); c.ellipse(x, y, rx * 0.93, ry * 0.86, 0, 0, Math.PI * 2); c.fill();
     }
-    // distant blue mountain ranges behind the main mountain
-    c.fillStyle = '#7FA9CE';
-    c.beginPath(); c.moveTo(0, 900);
-    for (let x = 0; x <= 1200; x += 60) c.lineTo(x, 620 + Math.sin(x * 0.012) * 90 + rnd() * 60);
-    c.lineTo(1200, 1400); c.lineTo(0, 1400); c.closePath(); c.fill();
-    c.fillStyle = '#6E97BF';
-    c.beginPath(); c.moveTo(0, 1200);
-    for (let x = 0; x <= 1200; x += 50) c.lineTo(x, 1000 + Math.sin(x * 0.02 + 2) * 110 + rnd() * 70);
-    c.lineTo(1200, 1800); c.lineTo(0, 1800); c.closePath(); c.fill();
-
-    // rock body of the main mountain
-    const outline = (inset: number, jag: number, seed: number) => {
-      const r = mulberry32(seed);
-      const left: [number, number][] = [];
-      for (let y = 0; y <= 3000; y += 26) left.push([edgeL(y) + inset + (r() - 0.5) * jag, y]);
-      c.beginPath();
-      c.moveTo(left[0][0], left[0][1]);
-      for (const [x, y] of left) c.lineTo(x, y);
-      for (let i = left.length - 1; i >= 0; i--) c.lineTo(WORLD.w - left[i][0], left[i][1]);
-      c.closePath();
-    };
-    outline(0, 26, 7); c.fillStyle = '#5A6878'; c.fill();
-    outline(6, 22, 8); c.fillStyle = '#6D7A8C'; c.fill();
-    // snow per area with vertical gradients
-    AREAS.forEach((a, i) => {
-      const [y0, y1] = a.band;
-      c.save();
-      outline(26, 30, 11); c.clip();
-      const g = c.createLinearGradient(0, y0, 0, y1);
-      g.addColorStop(0, SNOW[Math.min(4, i + 1)]); g.addColorStop(1, SNOW[i]);
-      c.fillStyle = g; c.fillRect(0, y0, WORLD.w, y1 - y0 + 1);
-      // soft drifts
-      for (let k = 0; k < 14; k++) {
-        const x = rnd() * 1200, y = y0 + rnd() * (y1 - y0), w = 90 + rnd() * 200;
-        c.fillStyle = 'rgba(190,212,232,0.28)'; c.beginPath(); c.ellipse(x, y, w, 9 + rnd() * 10, 0, 0, 6.3); c.fill();
-        c.fillStyle = 'rgba(255,255,255,0.5)'; c.beginPath(); c.ellipse(x - 12, y - 6, w * 0.8, 6, 0, 0, 6.3); c.fill();
-      }
-      c.restore();
-    });
-    // glacier crevasses and ice highlights
-    c.save(); outline(26, 30, 11); c.clip();
-    for (let i = 0; i < 16; i++) {
-      const x = 100 + rnd() * 1000, y = 30 + rnd() * 440;
-      c.strokeStyle = 'rgba(70,130,180,0.45)'; c.lineWidth = 1.6 + rnd() * 2;
-      c.beginPath(); c.moveTo(x, y); c.lineTo(x + 30 + rnd() * 50, y + 10 + rnd() * 20); c.lineTo(x + 60 + rnd() * 60, y + 4 + rnd() * 26); c.stroke();
+    // ---- glacier: ice patches and cracks
+    for (let i = 0; i < 26; i++) {
+      const x = rnd() * 1200, y = 30 + rnd() * 450;
+      c.fillStyle = 'rgba(150,205,245,0.22)'; c.beginPath(); c.ellipse(x, y, 40 + rnd() * 90, 10 + rnd() * 22, 0, 0, Math.PI * 2); c.fill();
     }
-    c.restore();
-    // area ridge lines (shadow + snow lip)
-    for (let i = 1; i < AREAS.length; i++) {
-      if (i === 4) continue;
-      const yy = AREAS[i - 1].band[0];
-      c.save(); outline(26, 30, 11); c.clip();
-      const g = c.createLinearGradient(0, yy - 6, 0, yy + 22);
-      g.addColorStop(0, 'rgba(90,110,135,0.38)'); g.addColorStop(1, 'rgba(90,110,135,0)');
-      c.fillStyle = g; c.fillRect(0, yy - 6, WORLD.w, 28);
-      c.beginPath(); c.moveTo(0, yy);
-      for (let x = 0; x <= 1200; x += 40) c.lineTo(x, yy - 4 + Math.sin(x * 0.03 + i) * 5 + rnd() * 4);
-      c.lineTo(1200, yy - 14); c.lineTo(0, yy - 14); c.closePath(); c.fillStyle = 'rgba(255,255,255,0.75)'; c.fill();
-      c.restore();
+    for (let i = 0; i < 22; i++) {
+      let x = 60 + rnd() * 1080, y = 30 + rnd() * 440;
+      c.strokeStyle = 'rgba(96,160,220,0.55)'; c.lineWidth = 2 + rnd() * 2; c.lineCap = 'round'; c.lineJoin = 'round';
+      c.beginPath(); c.moveTo(x, y);
+      for (let k = 0; k < 4; k++) { x += 20 + rnd() * 40; y += (rnd() - 0.4) * 24; c.lineTo(x, y); }
+      c.stroke();
     }
-    // canyon
+    // ---- area ridges: a soft shadow under every border
+    for (const a of AREAS) {
+      const y = a.band[0];
+      if (y === 0) continue;
+      const g = c.createLinearGradient(0, y, 0, y + 34);
+      g.addColorStop(0, 'rgba(150,180,220,0.38)'); g.addColorStop(1, 'rgba(150,180,220,0)');
+      c.fillStyle = g; c.fillRect(0, y, WORLD.w, 34);
+    }
+    // ---- canyon: deep blue crevasse with icy lips
     const [cy0, cy1] = CANYON_BAND;
-    c.save(); outline(26, 30, 11); c.clip();
+    c.fillStyle = 'rgba(150,180,220,0.4)'; c.fillRect(0, cy0 - 8, WORLD.w, 12);
     const cg = c.createLinearGradient(0, cy0, 0, cy1);
-    cg.addColorStop(0, '#5B6B7E'); cg.addColorStop(0.5, '#2B3A4C'); cg.addColorStop(1, '#4A5A6D');
-    c.fillStyle = cg;
-    c.beginPath(); c.moveTo(0, cy0 + 8);
-    for (let x = 0; x <= 1200; x += 30) c.lineTo(x, cy0 + 6 + rnd() * 10);
-    for (let x = 1200; x >= 0; x -= 30) c.lineTo(x, cy1 - 4 + rnd() * 10);
+    cg.addColorStop(0, '#5C86BC'); cg.addColorStop(0.5, '#274C86'); cg.addColorStop(1, '#3D68A3');
+    c.fillStyle = cg; c.beginPath(); c.moveTo(0, cy0 + 6);
+    for (let x = 0; x <= 1200; x += 26) c.lineTo(x, cy0 + 4 + rnd() * 9);
+    for (let x = 1200; x >= 0; x -= 26) c.lineTo(x, cy1 - 5 + rnd() * 9);
     c.closePath(); c.fill();
-    c.fillStyle = 'rgba(0,0,0,0.25)';
-    for (let x = 0; x < 1200; x += 70) { c.beginPath(); c.moveTo(x, cy0 + 12); c.lineTo(x + 20, cy1 - 8); c.lineTo(x + 34, cy0 + 12); c.fill(); }
-    c.restore();
-
-    // village ground
+    c.fillStyle = 'rgba(20,40,80,0.28)';
+    for (let x = 0; x < 1200; x += 60) { c.beginPath(); c.moveTo(x, cy0 + 12); c.lineTo(x + 18, cy1 - 8); c.lineTo(x + 30, cy0 + 12); c.fill(); }
+    c.fillStyle = '#FFFFFF';
+    for (let x = 0; x < 1200; x += 22) { c.beginPath(); c.moveTo(x, cy0 + 5); c.lineTo(x + 11, cy0 + 14 + rnd() * 8); c.lineTo(x + 22, cy0 + 5); c.fill(); }
+    // ---- soft edge shading on the left and right border
+    for (const side of [0, 1]) {
+      const x0 = side ? WORLD.w - 70 : 0;
+      const g = c.createLinearGradient(side ? WORLD.w : 0, 0, side ? WORLD.w - 70 : 70, 0);
+      g.addColorStop(0, 'rgba(120,160,205,0.38)'); g.addColorStop(1, 'rgba(120,160,205,0)');
+      c.fillStyle = g; c.fillRect(x0, 0, 70, WORLD.h);
+    }
+    // ---- village: cleared ground, road, parking lot, plaza
     const vg = c.createLinearGradient(0, 2900, 0, 3200);
-    vg.addColorStop(0, '#EAF3FA'); vg.addColorStop(1, '#C9D9E6');
-    c.fillStyle = vg; c.fillRect(0, 2895, WORLD.w, 305);
-    c.fillStyle = 'rgba(255,255,255,0.8)'; c.beginPath(); c.moveTo(0, 2896); for (let x = 0; x <= 1200; x += 40) c.lineTo(x, 2892 + Math.sin(x * 0.05) * 4 + rnd() * 4); c.lineTo(1200, 2908); c.lineTo(0, 2908); c.fill();
+    vg.addColorStop(0, '#FFFFFF'); vg.addColorStop(1, '#E4EEF8');
+    c.fillStyle = vg; c.fillRect(0, 2900, WORLD.w, 300);
+    c.fillStyle = '#DDE7F2'; c.beginPath(); c.roundRect(LODGE_POS.x - 150, LODGE_POS.y - 30, 300, 74, 22); c.fill();
+    c.strokeStyle = 'rgba(160,185,215,0.55)'; c.lineWidth = 1.5;
+    for (let x = LODGE_POS.x - 130; x < LODGE_POS.x + 140; x += 36) { c.beginPath(); c.moveTo(x, LODGE_POS.y - 28); c.lineTo(x, LODGE_POS.y + 42); c.stroke(); }
     // road
-    c.fillStyle = '#4C5866'; c.fillRect(0, ROAD_Y - 24, WORLD.w, 48);
-    c.fillStyle = '#5E6B7B'; c.fillRect(0, ROAD_Y - 24, WORLD.w, 4);
-    c.strokeStyle = '#F2D34F'; c.lineWidth = 3; c.setLineDash([26, 20]); c.beginPath(); c.moveTo(0, ROAD_Y); c.lineTo(WORLD.w, ROAD_Y); c.stroke(); c.setLineDash([]);
-    c.fillStyle = '#AFC2D3'; c.fillRect(0, ROAD_Y + 24, WORLD.w, 8);
+    c.fillStyle = 'rgba(96,128,176,0.28)'; c.fillRect(0, ROAD_Y - 20, WORLD.w, 52);
+    c.fillStyle = '#3E4A5B'; c.fillRect(0, ROAD_Y - 24, WORLD.w, 48);
+    c.fillStyle = '#4C5A6E'; c.fillRect(0, ROAD_Y - 24, WORLD.w, 5);
+    c.strokeStyle = '#FFD23F'; c.lineWidth = 3.4; c.setLineDash([28, 20]); c.beginPath(); c.moveTo(0, ROAD_Y); c.lineTo(WORLD.w, ROAD_Y); c.stroke(); c.setLineDash([]);
+    c.fillStyle = '#F4F8FC'; c.fillRect(0, ROAD_Y + 24, WORLD.w, 8);
     // parking lot
-    c.fillStyle = '#5A6675'; c.fillRect(PARKING_POS.x - 130, PARKING_POS.y - 122, 296, 160);
-    c.fillStyle = '#6A7686'; c.fillRect(PARKING_POS.x - 128, PARKING_POS.y - 120, 292, 4);
-    c.strokeStyle = 'rgba(255,255,255,0.7)'; c.lineWidth = 1.4;
-    for (let col = 0; col <= 10; col++) { c.beginPath(); c.moveTo(PARKING_POS.x - 126 + col * 28, PARKING_POS.y - 118); c.lineTo(PARKING_POS.x - 126 + col * 28, PARKING_POS.y + 34); c.stroke(); }
-    c.fillStyle = '#F4F8FB'; c.font = 'bold 13px system-ui, sans-serif'; c.textAlign = 'center';
-    c.fillText('P', PARKING_POS.x - 150, PARKING_POS.y - 100);
-    // lodge plaza
-    c.fillStyle = '#DCEAF5'; c.beginPath(); c.ellipse(LODGE_POS.x, LODGE_POS.y + 8, 130, 22, 0, 0, 6.3); c.fill();
+    c.fillStyle = 'rgba(96,128,176,0.3)'; c.beginPath(); c.roundRect(LOT.x0 + 8, LOT.y0 + 8, LOT.w, LOT.h, 10); c.fill();
+    c.fillStyle = '#465267'; c.beginPath(); c.roundRect(LOT.x0, LOT.y0, LOT.w, LOT.h, 10); c.fill();
+    c.fillStyle = '#525F76'; c.fillRect(LOT.x0 + 6, LOT.y0 + 4, LOT.w - 12, 3);
+    c.strokeStyle = 'rgba(255,255,255,0.8)'; c.lineWidth = 1.5;
+    for (let col = 0; col <= 10; col++) { c.beginPath(); c.moveTo(LOT.x0 + 6 + col * 28, LOT.y0 + 10); c.lineTo(LOT.x0 + 6 + col * 28, LOT.y0 + LOT.h - 8); c.stroke(); }
+    c.fillStyle = '#FFFFFF'; c.font = 'bold 15px system-ui, sans-serif'; c.textAlign = 'center';
+    fillPlate(c, LOT.x0 - 6, LOT.y0 + 6);
   }, 1);
+}
+
+function fillPlate(c: CanvasRenderingContext2D, x: number, y: number) {
+  c.fillStyle = '#2F8BEA'; c.beginPath(); c.roundRect(x - 12, y - 4, 24, 24, 6); c.fill();
+  c.fillStyle = '#FFFFFF'; c.font = 'bold 17px system-ui, sans-serif'; c.textAlign = 'center'; c.fillText('P', x, y + 14);
 }
 
 export const SKI_SWAY = (id: number) => Math.sin(id * 12.9898) * 26;
@@ -135,99 +104,171 @@ export function pisteCurve(fromX: number, fromY: number, toX: number, toY: numbe
   return { cx, cy };
 }
 
-const PISTE_SCALE = 0.75;
+const LAYER_SCALE = 0.75;
 
-/** pistes are baked into a canvas texture (smooth joins, no per-frame geometry) and redrawn only when lines change */
+/** red-orange net fence between two points (drawn on a canvas layer) */
+function net(c: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+  if (len < 4) return;
+  c.save(); c.translate(x0, y0); c.rotate(Math.atan2(dy, dx));
+  c.fillStyle = 'rgba(96,128,176,0.3)'; c.fillRect(0, 1, len, 4);
+  c.fillStyle = 'rgba(240,83,59,0.88)'; c.fillRect(0, -9, len, 7);
+  c.strokeStyle = 'rgba(255,255,255,0.85)'; c.lineWidth = 1.1;
+  for (let k = 0; k < len - 4; k += 6) { c.beginPath(); c.moveTo(k, -2); c.lineTo(k + 5, -9); c.stroke(); }
+  c.fillStyle = '#C9402C'; c.fillRect(0, -10.4, len, 1.8);
+  const n = Math.max(1, Math.round(len / 14));
+  c.fillStyle = '#4A5563';
+  for (let i = 0; i <= n; i++) c.fillRect((i * len) / n - 1, -12, 2, 13);
+  c.restore();
+}
+
+/** thin ski tracks, snow aprons and red fences: baked into canvas layers and redrawn only when lifts change */
 export class PisteLayer {
   private tex: Phaser.Textures.CanvasTexture;
+  private fenceTex: Phaser.Textures.CanvasTexture;
   constructor(scene: Phaser.Scene) {
-    this.tex = scene.textures.createCanvas('pistes', Math.ceil(WORLD.w * PISTE_SCALE), Math.ceil(WORLD.h * PISTE_SCALE))!;
-    scene.add.image(0, 0, 'pistes').setOrigin(0, 0).setScale(1 / PISTE_SCALE).setDepth(-90);
+    const w = Math.ceil(WORLD.w * LAYER_SCALE), h = Math.ceil(WORLD.h * LAYER_SCALE);
+    this.tex = scene.textures.createCanvas('pistes', w, h)!;
+    scene.add.image(0, 0, 'pistes').setOrigin(0, 0).setScale(1 / LAYER_SCALE).setDepth(-90);
+    this.fenceTex = scene.textures.createCanvas('fences', w, h)!;
+    // fences sit above the ground props, below guests: depth by y is not needed for thin lines
+    scene.add.image(0, 0, 'fences').setOrigin(0, 0).setScale(1 / LAYER_SCALE).setDepth(2000);
+    this.drawFences([]);
   }
+
   redraw(lines: { areaId: string; slot: number }[], ownedAreas: string[]) {
     const c = this.tex.getContext();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, this.tex.width, this.tex.height);
-    c.scale(PISTE_SCALE, PISTE_SCALE);
+    c.scale(LAYER_SCALE, LAYER_SCALE);
     c.lineCap = 'round'; c.lineJoin = 'round';
-    const strip = (x0: number, y0: number, x1: number, y1: number, w: number, col: string) => {
+    const point = (x0: number, y0: number, x1: number, y1: number, t: number, off: number, wob: number) => {
       const { cx, cy } = pisteCurve(x0, y0, x1, y1);
-      c.strokeStyle = col; c.lineWidth = w;
-      c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(cx, cy, x1, y1); c.stroke();
+      const u = 1 - t;
+      const px = u * u * x0 + 2 * u * t * cx + t * t * x1, py = u * u * y0 + 2 * u * t * cy + t * t * y1;
+      const tx = 2 * u * (cx - x0) + 2 * t * (x1 - cx), ty = 2 * u * (cy - y0) + 2 * t * (y1 - cy);
+      const l = Math.hypot(tx, ty) || 1;
+      return [px - (ty / l) * off + Math.sin(t * 14 + wob) * 2.4, py + (tx / l) * off];
+    };
+    const track = (x0: number, y0: number, x1: number, y1: number, off: number, wob: number, col: string, w: number) => {
+      c.strokeStyle = col; c.lineWidth = w; c.beginPath();
+      for (let i = 0; i <= 34; i++) { const [px, py] = point(x0, y0, x1, y1, i / 34, off, wob); if (i === 0) c.moveTo(px, py); else c.lineTo(px, py); }
+      c.stroke();
     };
     AREAS.forEach((a, ai) => {
       if (!ownedAreas.includes(a.id)) return;
       const h = hub(ai);
-      c.fillStyle = 'rgba(190,212,232,0.7)'; c.beginPath(); c.ellipse(h.x, h.y + 6, 170, 26, 0, 0, 6.3); c.fill();
-      c.fillStyle = 'rgba(255,255,255,0.97)'; c.beginPath(); c.ellipse(h.x, h.y + 2, 150, 19, 0, 0, 6.3); c.fill();
+      c.fillStyle = 'rgba(184,205,232,0.5)'; c.beginPath(); c.ellipse(h.x, h.y + 4, 176, 28, 0, 0, 6.3); c.fill();
+      c.fillStyle = '#FFFFFF'; c.beginPath(); c.ellipse(h.x, h.y, 160, 22, 0, 0, 6.3); c.fill();
+      for (let k = 0; k < 9; k++) { c.strokeStyle = 'rgba(160,188,222,0.6)'; c.lineWidth = 1.8; c.beginPath(); c.moveTo(h.x - 140 + k * 14 + (k % 2) * 6, h.y - 8); c.quadraticCurveTo(h.x - 100 + k * 25, h.y + 6, h.x - 60 + k * 18, h.y + 12); c.stroke(); }
     });
     for (const l of lines) {
       const ai = AREAS.findIndex(a => a.id === l.areaId);
       const b = slotBase(ai, l.slot), t = slotTop(ai, l.slot), h = hub(ai);
-      strip(t.x, t.y, h.x, h.y, 122, 'rgba(178,203,226,0.6)');
-      strip(t.x, t.y, h.x, h.y, 100, 'rgba(255,255,255,0.98)');
-      strip(t.x - 24, t.y, h.x - 24, h.y, 2.4, 'rgba(206,222,236,0.9)');
-      strip(t.x + 24, t.y, h.x + 24, h.y, 2.4, 'rgba(206,222,236,0.9)');
-      // soft queue apron under the base station
-      c.fillStyle = 'rgba(190,212,232,0.55)'; c.beginPath(); c.ellipse(b.x, b.y + 46, 60, 52, 0, 0, 6.3); c.fill();
-      c.fillStyle = 'rgba(255,255,255,0.96)'; c.beginPath(); c.ellipse(b.x, b.y + 44, 54, 46, 0, 0, 6.3); c.fill();
+      track(t.x, t.y, h.x, h.y, 0, 0, 'rgba(196,214,238,0.55)', 96);
+      track(t.x, t.y, h.x, h.y, 0, 0, 'rgba(255,255,255,0.95)', 82);
+      [-30, -15, 0, 15, 30].forEach((o, k) => track(t.x, t.y, h.x, h.y, o, k * 1.7, 'rgba(146,176,214,0.78)', 2.1));
+      // queue apron under the base station
+      c.fillStyle = 'rgba(184,205,232,0.5)'; c.beginPath(); c.roundRect(b.x - 52, b.y - 10, 104, 118, 20); c.fill();
+      c.fillStyle = '#FFFFFF'; c.beginPath(); c.roundRect(b.x - 47, b.y - 6, 94, 108, 17); c.fill();
+      for (let k = 0; k < 4; k++) { c.strokeStyle = 'rgba(146,176,214,0.5)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(b.x - 36 + k * 24, b.y + 8); c.lineTo(b.x - 36 + k * 24, b.y + 94); c.stroke(); }
     }
     this.tex.refresh();
+    this.drawFences(lines);
+  }
+
+  private drawFences(lines: { areaId: string; slot: number }[]) {
+    const c = this.fenceTex.getContext();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.clearRect(0, 0, this.fenceTex.width, this.fenceTex.height);
+    c.scale(LAYER_SCALE, LAYER_SCALE);
+    // border nets between areas, with a gap where guests walk between hubs
+    // (pieces are skipped where a lift base, a lift top or the hub walkway is)
+    AREAS.forEach((a, ai) => {
+      const y = a.band[0];
+      if (y === 0) return;
+      const gaps: [number, number][] = [[520, 680]];
+      for (const l of lines) {
+        const li = AREAS.findIndex(x => x.id === l.areaId);
+        if (li === ai) { const tp = slotTop(li, l.slot); gaps.push([tp.x - 66, tp.x + 66]); }
+        if (li === ai - 1) { const bs = slotBase(li, l.slot); gaps.push([bs.x - 66, bs.x + 66]); }
+      }
+      gaps.sort((p, q) => p[0] - q[0]);
+      let x = 24;
+      for (const [g0, g1] of gaps) { if (g0 > x) net(c, x, y, Math.min(g0, 1176), y); x = Math.max(x, g1); }
+      if (x < 1176) net(c, x, y, 1176, y);
+    });
+    // short wing nets guiding the queue at each lift base
+    for (const l of lines) {
+      const ai = AREAS.findIndex(a => a.id === l.areaId);
+      const b = slotBase(ai, l.slot);
+      net(c, b.x - 50, b.y + 46, b.x - 50, b.y + 6);
+      net(c, b.x + 50, b.y + 46, b.x + 50, b.y + 6);
+    }
+    // parking lot fence
+    c.strokeStyle = '#2F4A78'; c.lineWidth = 2.4; c.strokeRect(LOT.x0 - 3, LOT.y0 - 3, LOT.w + 6, LOT.h + 6);
+    c.fillStyle = '#2F4A78'; for (let x = LOT.x0; x <= LOT.x0 + LOT.w; x += 20) { c.fillRect(x - 1, LOT.y0 - 7, 2.4, 6); c.fillRect(x - 1, LOT.y0 + LOT.h + 1, 2.4, 6); }
+    this.fenceTex.refresh();
   }
 }
 
-/** static decoration: pines and rocks, avoiding lifts, zones and buildings */
+/** static decoration: dense forest at the edges, tree groups, bushes and rocks, avoiding lifts, zones and buildings */
 export function placeDecor(scene: Phaser.Scene, layer: Phaser.GameObjects.Layer) {
   const rnd = mulberry32(99);
   const keepOut: { x: number; y: number; r: number }[] = [];
   AREAS.forEach((a, ai) => {
     a.slots.forEach((_, i) => {
       const b = slotBase(ai, i), t = slotTop(ai, i);
-      for (let k = 0; k <= 6; k++) keepOut.push({ x: b.x + (t.x - b.x) * k / 6, y: b.y + (t.y - b.y) * k / 6, r: 85 });
-      keepOut.push({ x: 600, y: hub(ai).y, r: 190 });
+      for (let k = 0; k <= 8; k++) keepOut.push({ x: b.x + (t.x - b.x) * k / 8, y: b.y + (t.y - b.y) * k / 8, r: 92 });
     });
+    keepOut.push({ x: 600, y: hub(ai).y, r: 200 });
   });
-  for (const b of BUILDINGS) keepOut.push({ x: b.pos.x, y: b.pos.y, r: 90 });
+  for (const b of BUILDINGS) keepOut.push({ x: b.pos.x, y: b.pos.y - 30, r: 95 });
   for (const z of ZONES) keepOut.push({ x: z.pos.x + 70, y: z.pos.y - 30, r: 100 });
+  keepOut.push({ x: LODGE_POS.x, y: LODGE_POS.y - 40, r: 150 }, { x: PARKING_POS.x + 20, y: PARKING_POS.y - 40, r: 200 });
   const free = (x: number, y: number) => !keepOut.some(k => (k.x - x) ** 2 + (k.y - y) ** 2 < k.r * k.r);
-  const keys = ['pine_s', 'pine_m', 'pine_l'];
-  for (let y = 40; y < 2890; y += 30) {
+  const pines = ['pine_s', 'pine_m', 'pine_l'];
+  const put = (key: string, x: number, y: number, sc: number) => {
+    const img = scene.add.image(x, y, ATLAS, key).setOrigin(0.5, 0.97).setScale(sc / S);
+    img.setDepth(y); layer.add(img);
+  };
+  // dense forest at both edges
+  for (let y = 20; y < 2900; y += 24) {
     if (y > 500 && y < 570) continue;
-    for (let side = 0; side < 2; side++) {
-      for (let k = 0; k < 2; k++) {
-        const inset = 30 + rnd() * 90;
-        const x = side === 0 ? edgeL(y) + inset : WORLD.w - edgeL(y) - inset;
-        const yy = y + rnd() * 26;
-        if (!free(x, yy) || rnd() < 0.2) continue;
-        const key = keys[Math.floor(rnd() * 3)];
-        const img = scene.add.image(x, yy, ATLAS, key).setOrigin(0.5, 1).setScale(0.5 * (0.85 + rnd() * 0.3));
-        img.setDepth(yy); layer.add(img);
+    for (const side of [0, 1]) {
+      const rows = 2 + Math.floor(rnd() * 2);
+      for (let k = 0; k < rows; k++) {
+        const inset = 18 + k * 34 + rnd() * 22;
+        const x = side === 0 ? inset : WORLD.w - inset;
+        const yy = y + rnd() * 20;
+        if (!free(x, yy) || rnd() < 0.12) continue;
+        put(pines[Math.floor(rnd() * 3)], x, yy, 0.85 + rnd() * 0.4);
       }
     }
   }
-  // scattered clusters in open snow
-  for (let i = 0; i < 90; i++) {
-    const y = 60 + rnd() * 2820;
+  // top edge of the glacier and the far end of the village
+  for (let x = 30; x < 1180; x += 30) { const y = 26 + rnd() * 26; if (free(x, y) && rnd() < 0.7) put(pines[Math.floor(rnd() * 3)], x, y, 0.85 + rnd() * 0.3); }
+  // scattered groups in open snow
+  for (let i = 0; i < 130; i++) {
+    const y = 90 + rnd() * 2800;
     if (y > 495 && y < 575) continue;
-    const x = edgeL(y) + 60 + rnd() * (WORLD.w - 2 * edgeL(y) - 120);
-    if (!free(x, y) || rnd() < 0.35) continue;
-    const img = scene.add.image(x, y, ATLAS, rnd() < 0.7 ? keys[Math.floor(rnd() * 3)] : ['rock_a', 'rock_b'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.4));
-    img.setDepth(y); layer.add(img);
+    const x = 110 + rnd() * 980;
+    if (!free(x, y)) continue;
+    const r = rnd();
+    if (r < 0.5) put(pines[Math.floor(rnd() * 3)], x, y, 0.8 + rnd() * 0.35);
+    else if (r < 0.8) put(rnd() < 0.5 ? 'bush_a' : 'bush_b', x, y, 0.9 + rnd() * 0.4);
+    else put(['rock_a', 'rock_b'][Math.floor(rnd() * 2)], x, y, 0.75 + rnd() * 0.4);
   }
-  // rocks along ridge lines
-  for (const a of AREAS) {
-    for (let i = 0; i < 6; i++) {
-      const y = a.band[0] + 4 + rnd() * 10, x = 100 + rnd() * 1000;
-      if (!free(x, y)) continue;
-      const img = scene.add.image(x, y, ATLAS, ['rock_b', 'rock_c'][Math.floor(rnd() * 2)]).setOrigin(0.5, 1).setScale(0.5 * (0.8 + rnd() * 0.5));
-      img.setDepth(y); layer.add(img);
-    }
+  // rocks tucked along the borders
+  for (const a of AREAS) for (let i = 0; i < 5; i++) {
+    const y = a.band[0] + 18 + rnd() * 10, x = 80 + rnd() * 1040;
+    if (Math.abs(x - 600) < 110 || !free(x, y)) continue;
+    put(['rock_b', 'rock_c'][Math.floor(rnd() * 2)], x, y, 0.7 + rnd() * 0.4);
   }
   // village trees
-  for (let i = 0; i < 14; i++) {
-    const x = 40 + rnd() * 1120, y = 2915 + rnd() * 30;
-    if (Math.abs(x - 600) < 120 || x < 380 || (x > 900 && x < 1140)) continue;
-    const img = scene.add.image(x, y, ATLAS, keys[Math.floor(rnd() * 3)]).setOrigin(0.5, 1).setScale(0.5);
-    img.setDepth(y); layer.add(img);
+  for (let i = 0; i < 16; i++) {
+    const x = 380 + rnd() * 500, y = 2918 + rnd() * 30;
+    if (Math.abs(x - 600) < 130 || !free(x, y)) continue;
+    put(pines[Math.floor(rnd() * 3)], x, y, 0.85);
   }
 }

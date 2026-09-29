@@ -10,7 +10,7 @@ describe('sprite atlas frames', () => {
   const baked = new Set<string>();
   for (const m of art.matchAll(/bake\(scene, '([a-z_0-9]+)'/g)) baked.add(m[1]);
   for (const m of art.matchAll(/bake\(scene, `([^`]+)`/g)) {
-    if (m[1].startsWith('car_')) for (let i = 0; i < 4; i++) baked.add(`car_${i}`);
+    if (m[1].startsWith('car_')) for (let i = 0; i < 8; i++) baked.add(`car_${i}`);
     else if (m[1].startsWith('g_')) { /* guest frames are checked below */ }
   }
   for (const k of ['ski', 'board']) for (let c = 0; c < 6; c++) for (let f = 0; f < 2; f++) baked.add(`g_${k}_${c}_${f}`);

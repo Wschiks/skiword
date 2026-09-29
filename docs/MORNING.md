@@ -16,7 +16,7 @@ npm run dev        # open http://localhost:5173 in a phone-sized window (or your
 - Real app: `docs/native.md` (needs Xcode / Android Studio, which this Mac does not have yet).
 
 ## Look at these first (screenshots, no need to run anything)
-1. `screenshots/final/` : the final look from the last commit (fresh start, early, mid, late game, HUD and all sheets)
+1. `screenshots/restyle-v4/` : the current look (bright chunky cartoon, after your reference images). `screenshots/final/` is the old dark look (tag `v1-classic-look`)
 2. `screenshots/m7-art-tour/` : close-ups of every zone and building
 3. `screenshots/options/` : the night theme (branch `option/night-theme`)
 4. `screenshots/README.md` : index of every step, in order, so you can see what changed and what you might want back

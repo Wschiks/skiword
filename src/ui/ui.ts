@@ -16,7 +16,7 @@ import { App as NativeApp } from '@capacitor/app';
 import { ads } from '../ads';
 import { purchases } from '../purchases';
 import { icons } from './icons';
-import { formatMoney, formatNum, formatRate, formatTime } from './format';
+import { formatMoney, formatNum, formatTime } from './format';
 import { sfx, haptic, initAudio, setSoundEnabled, setHapticsEnabled } from './sound';
 import { confetti } from './confetti';
 import { bar } from './util';
@@ -407,10 +407,11 @@ function tick(force = false) {
   refreshCtx();
   const s = app.state;
   // top bar every tick
-  setHTML($('topbar'), `<div class="tb-money" id="money">${icons.coin}<div><div class="tb-amt">${formatMoney(s.money)}</div><div class="tb-rate">${formatRate(s.incomeEma)}</div></div></div>
-    <div class="tb-pills"><div class="pill gems">${icons.gem}<b>${formatNum(s.gems)}</b></div>
-    <div class="pill pop-pill">${icons.people}<b>${s.rt.guests.length}<span>/${maxPop(s)}</span></b>${icons.face(mood())}</div></div>
-    <button class="icon-btn menu-btn" data-act="tab" data-a="menu" aria-label="Menu">${icons.gear}</button>`);
+  setHTML($('topbar'), `<div class="tb-left"><div class="tb-rate">${formatMoney(s.incomeEma * 60)}/min</div>
+      <div class="cash-pill tb-money" id="money"><i class="coin-badge">${icons.coin}</i><b class="tb-amt">${formatMoney(s.money)}</b></div></div>
+    <div class="tb-right"><div class="gem-pill">${icons.gem}<b>${formatNum(s.gems)}</b></div>
+      <div class="pop-pill">${icons.people}<b>${s.rt.guests.length}<span>/${maxPop(s)}</span></b>${icons.face(mood())}</div></div>
+    <button class="sq-btn menu-btn" data-act="tab" data-a="menu" aria-label="Menu">${icons.gear}</button>`);
   const now = performance.now();
   if (force || now - last250 > 250) { last250 = now; renderAll(false); }
   // map ring for tutorial
@@ -448,7 +449,7 @@ function renderAll(immediate: boolean) {
     el.classList.toggle('pulse', tpulse === tb.id && open !== tb.id);
   }
   // let the camera scroll the map above an open sheet (and make room for purchase glides)
-  if (scene) scene.mv.padBottom = open ? $('sheet').offsetHeight + 60 : 96;
+  if (scene) scene.mv.padBottom = open ? $('sheet').offsetHeight + 86 : 110;
   // sheet
   if (open) {
     $('sheet-title').textContent = TITLES[open];

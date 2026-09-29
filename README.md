@@ -5,9 +5,9 @@ A portrait 2D idle tycoon for phones. You build and upgrade a ski resort: real l
 The whole game is drawn in code (canvas 2D baked into textures, inline SVG icons): there are no image assets.
 
 <p align="center">
-  <img src="screenshots/m7-polish/ui-01-fresh-tutorial.jpg" width="24%" alt="Fresh start with tutorial" />
-  <img src="screenshots/m7-polish/06-late-40h-view.jpg" width="24%" alt="Late game mountain" />
-  <img src="screenshots/m7-polish/ui-04-lifts.jpg" width="24%" alt="Lifts sheet" />
+  <img src="screenshots/restyle-v4/ui-01-fresh-tutorial.jpg" width="24%" alt="Fresh start with tutorial" />
+  <img src="screenshots/restyle-v4/06-late-40h-view.jpg" width="24%" alt="Late game mountain" />
+  <img src="screenshots/restyle-v4/ui-04-lifts.jpg" width="24%" alt="Lifts sheet" />
   <img src="screenshots/options/night-theme-mid-game.jpg" width="24%" alt="Night theme (option branch)" />
 </p>
 

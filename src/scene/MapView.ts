@@ -5,7 +5,7 @@ import { WORLD, ZOOM } from '../config/layout';
 export class MapView {
   cx = WORLD.w / 2; cy = 2300; zoom = 0.33;
   w = 390; h = 844; dpr = 1;
-  padTop = 118; padBottom = 96;
+  padTop = 150; padBottom = 110;
   private pointers = new Map<number, { x: number; y: number }>();
   private vx = 0; private vy = 0;
   private lastPinch = 0;
