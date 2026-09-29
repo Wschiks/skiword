@@ -17,6 +17,7 @@ This machine only had the Command Line Tools and no Android SDK, so the native a
 | Purchases | `MockPurchases` | `@capgo/native-purchases` (StoreKit 2 / Play Billing), product ids in `src/config/shop.ts` |
 | Haptics | `navigator.vibrate` | `@capacitor/haptics` |
 | Splash / status bar | n/a | `@capacitor/splash-screen`, `@capacitor/status-bar` |
+| Android Back button / pause | n/a | `@capacitor/app`: Back closes the top dialog or sheet, then minimizes; `pause` saves |
 
 Both services are behind `src/ads.ts` and `src/purchases.ts` (`isReady()/showRewarded()`, `priceOf()/purchase()/restore()`), so game code never touches a plugin.
 

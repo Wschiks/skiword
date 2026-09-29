@@ -11,6 +11,8 @@ import {
   listPurchases, maxPop, nextGoal, seasonPreview, startNewSeason, queueCap,
 } from '../core/game';
 import { clearSave, saveState } from '../core/save';
+import { Capacitor } from '@capacitor/core';
+import { App as NativeApp } from '@capacitor/app';
 import { ads } from '../ads';
 import { purchases } from '../purchases';
 import { icons } from './icons';
@@ -73,6 +75,15 @@ export function initUI() {
   setupSheetDrag();
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); else saveNow(); });
   window.addEventListener('pagehide', saveNow);
+  if (Capacitor.isNativePlatform()) {
+    // Android hardware Back: close the top-most dialog or sheet first, only then leave the game
+    void NativeApp.addListener('backButton', () => {
+      if (modalOpen && modalOpen !== 'offline') closeModal();
+      else if (open) closeSheet();
+      else void NativeApp.minimizeApp();
+    });
+    void NativeApp.addListener('pause', () => saveNow());
+  }
   setInterval(tick, 100);
   tick(true);
   setTimeout(() => showOfflineOnStart(), 400);

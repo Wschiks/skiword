@@ -21,3 +21,10 @@ Everything runs with npm scripts. Playwright tests start their own Vite server (
 - Headless Chromium uses SwiftShader (software WebGL). The built-in browser pane in the Claude app uses the real GPU and is the place to look at frame rate (60 fps with 189 guests on an Apple M2 Pro).
 - After changing anything in `src/config/*` or the economy, run `npm test` and `npm run simulate -- --fast`; after UI work run `smoke`, `flows` and `touch`.
 - Not covered: real devices, real ad/purchase plugins (mock on web), native builds.
+
+## Extra tools
+| Command | What it does |
+|---|---|
+| `node scripts/uiplay.mjs [n]` | UI autoplayer: the bot picks purchases, Playwright buys them through the real UI (320 purchases, 34 h of game time) |
+| `node scripts/startup.mjs [cpuRate]` | time to "map ready" on the production build with the CPU throttled (about 2 s at 6x) |
+| `npx tsx scripts/design-tables.ts` | regenerates `docs/design-tables.md` |
