@@ -9,4 +9,4 @@ export function currentTheme(): Theme {
   return THEME_DEFAULT;
 }
 /** multiply tint applied over the whole world at night (R, G, B 0..255) */
-export const NIGHT_TINT = 0x5a70c0;
+export const NIGHT_TINT = 0x6f83cf;

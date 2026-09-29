@@ -14,6 +14,8 @@ import { BusView, VillageView } from './busView';
 import { Fx } from './fx';
 import { formatMoney } from '../ui/format';
 import { UI } from '../config/balance';
+import { currentTheme } from '../config/theme';
+import { NightLayer } from './night';
 
 export type MapHit =
   | { type: 'line'; id: string } | { type: 'slot'; areaId: string; slot: number }
@@ -64,7 +66,7 @@ export class MapScene extends Phaser.Scene {
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
     this.onResize();
-    this.cameras.main.setBackgroundColor('#EAF3FB');
+    if (!this.night) this.cameras.main.setBackgroundColor('#EAF3FB');
     app.on('focus', (f: { x: number; y: number; pan?: boolean; zoom?: number; burst?: number; yFrac?: number }) => {
       if (f.pan) this.mv.panTo(f.x, f.y, f.zoom, f.yFrac ?? 0.5);
       if (f.burst) this.fx.burst(f.x, f.y, f.burst);

@@ -302,3 +302,18 @@ html, body { background: radial-gradient(circle at 50% 20%, #7FB6EE, #2C5C99); }
 #quests { top: calc(var(--safe-top) + 104px); }
 #tut { top: calc(var(--safe-top) + 176px); }
 #toasts { top: calc(var(--safe-top) + 226px); }
+
+/* night theme on the new look */
+.night { background: #22336b; }
+.night .tb-rate { color: #CFE0FF; text-shadow: 0 1px 0 #14213a; }
+.night .qchip, .night .nextpill { background: rgba(28,42,72,.96); border-color: #33497A; box-shadow: 0 3px 0 #101a30, 0 5px 9px rgba(0,0,0,.35); }
+.night .qchip.done { background: #4A3E12; border-color: #7A6320; }
+.night #sheet { background: #1B2A42; border-top-color: #33497A; }
+.night .card { border-color: #2C4160; box-shadow: 0 3px 0 #0F1A2C; }
+.night .modal-card { background: #1B2A42; border-color: #33497A; }
+.night .sheet-title, .night .modal-title { color: #9CC8FF; }
+.night .btn.ghost { background: #31486A; box-shadow: 0 3px 0 #1B2A42; color: #DCE8F5; }
+.night .btn.off { background: #4B5F7D; box-shadow: 0 3px 0 #33445E; }
+.night .hintline { border-color: #2C4160; }
+.night .tab, .night .tab.on { color: #fff; }
+.night .pill, .night .ico { color: #DCE8F5; }

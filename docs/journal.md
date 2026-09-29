@@ -72,3 +72,6 @@ Screenshots per milestone are in `screenshots/` (see `screenshots/README.md`).
 - UI (`src/styles.css` v2 block, top bar markup in `ui.ts`): green cash pill with per-minute income, gold gem pill, blue population pill, blue square gear button, floating chunky blue tab buttons (orange when active), green primary buttons with a hard bottom edge, thicker white borders, soft blue sheets. Everything still uses the same state and logic.
 - Rejected: keeping the old dark look as a "theme" (the two never shared any art); it is one tag away instead: `git checkout v1-classic-look`.
 - Screenshots: `screenshots/restyle-v1` to `restyle-v4` (iterations), `screenshots/restyle-art-tour` (close-ups).
+
+### Branch option/night-theme after the restyle
+- The new look has no sky or rock walls, so the stars and moon were dropped. The night theme is now: multiply tint over the whole world, glowing windows/lamps (additive `glow` frames at stations, buildings, lodge, parking), dark UI variants. `?theme=day` switches back.
