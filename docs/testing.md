@@ -1,6 +1,6 @@
 # Testing and tooling guide
 
-Everything runs with npm scripts. Playwright tests start their own Vite server (`SERVE=preview` runs them against the production build instead).
+Everything runs with npm scripts. Browser tests need Chromium once: `npx playwright install chromium`. Playwright tests start their own Vite server (`SERVE=preview` runs them against the production build instead).
 
 | Command | What it checks |
 |---|---|

@@ -15,6 +15,7 @@ The whole game is drawn in code (canvas 2D baked into textures, inline SVG icons
 npm install
 npm run dev            # http://localhost:5173  (?debug for debug keys, ?new for a fresh save)
 npm test               # 48 unit + playthrough tests
+npx playwright install chromium   # one time, needed by the browser tests below
 npm run smoke          # Playwright: canvas, first upgrade, six sheets, map tap, drag, autosave
 npm run flows          # Playwright: save/load, offline dialog, quests, ski bus, shop, New Season
 npm run simulate -- --fast --report   # balance bot, writes docs/balance-report.md
