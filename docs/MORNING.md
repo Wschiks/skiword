@@ -10,8 +10,13 @@ npm run dev        # open http://localhost:5173 in a phone-sized window (or your
 ```
 `?debug` adds debug keys, `?new` ignores the saved game. Tap the ringed lift, upgrade it, watch guests arrive.
 
+## Want to play on your phone?
+- Same wifi: `npm run dev` prints a `Network:` URL, open it on the phone (portrait).
+- From anywhere: I did **not** publish the game. `docs/examples/github-pages.yml` is a ready workflow if you want a Pages URL (3 steps inside the file).
+- Real app: `docs/native.md` (needs Xcode / Android Studio, which this Mac does not have yet).
+
 ## Look at these first (screenshots, no need to run anything)
-1. `screenshots/m7-polish/` : the final look (fresh start, early, mid, late game, HUD and all sheets)
+1. `screenshots/final/` : the final look from the last commit (fresh start, early, mid, late game, HUD and all sheets)
 2. `screenshots/m7-art-tour/` : close-ups of every zone and building
 3. `screenshots/options/` : the night theme (branch `option/night-theme`)
 4. `screenshots/README.md` : index of every step, in order, so you can see what changed and what you might want back
