@@ -34,6 +34,7 @@ npm run dev        # open http://localhost:5173 in a phone-sized window (or your
 | `docs/native.md` | Android/iOS notes and the checklist before a real release |
 
 ## Git
+- Heads-up: `Wschiks/skiword` is a **public** repo on GitHub, so everything pushed is visible. I checked history for secrets: none (only Google's public AdMob *test* ids).
 - `main`: the finished build. Milestone tags: `m2-core`, `m3-map`, `m4-m6-ui`, `m7-m8-polish-native`.
 - `option/fast-balance`: everything maxed in about 25 h instead of 76 h.
 - `option/night-theme`: evening look, dark UI.
