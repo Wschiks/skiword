@@ -8,7 +8,7 @@ The whole game is drawn in code (canvas 2D baked into textures, inline SVG icons
   <img src="screenshots/restyle-v4/ui-01-fresh-tutorial.jpg" width="24%" alt="Fresh start with tutorial" />
   <img src="screenshots/restyle-v4/06-late-40h-view.jpg" width="24%" alt="Late game mountain" />
   <img src="screenshots/restyle-v4/ui-04-lifts.jpg" width="24%" alt="Lifts sheet" />
-  <img src="screenshots/options/night-theme-mid-game.jpg" width="24%" alt="Night theme (option branch)" />
+  <img src="screenshots/options/night-theme-v2-04-mid-3h-full-view.jpg" width="24%" alt="Night theme (option branch)" />
 </p>
 
 ```bash
