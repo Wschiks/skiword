@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { WORLD, ZOOM } from '../config/layout';
+import { START_ZOOM, WORLD, ZOOM } from '../config/layout';
 
 /** Camera controller: drag to pan, pinch / wheel to zoom, tap detection. Uses DOM pointer events. */
 export class MapView {
@@ -31,7 +31,7 @@ export class MapView {
     const oldFit = this.fit;
     this.w = w; this.h = h; this.dpr = dpr;
     this.fit = w / WORLD.w;
-    if (!this.inited) { this.inited = true; this.zoom = this.fit; this.cy = 1e6; }
+    if (!this.inited) { this.inited = true; this.zoom = this.fit * START_ZOOM; this.cy = 1e6; }
     else this.zoom *= this.fit / oldFit;
     this.clamp();
   }
