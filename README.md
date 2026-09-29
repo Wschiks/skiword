@@ -31,6 +31,7 @@ npm run simulate -- --fast --report   # balance bot, writes docs/balance-report.
 | `docs/roadmap.md` | done / not done / ideas for later |
 | `docs/removed-and-alternatives.md` | things that were replaced or removed, with the tag/path to get each one back |
 | `docs/balance-report.md` | balance bot timeline vs targets and the tuned cost multipliers |
+| `docs/casual-play.md` | how long a casual player (a few short sessions a day) needs: 6 to 10 days |
 | `docs/testing.md` | every test and tool, what it checks |
 | `docs/design-tables.md` | lift tiers, areas, capacity, buildings and zones as generated tables |
 | `docs/native.md` | Android / iOS build notes and the pre-release checklist |
