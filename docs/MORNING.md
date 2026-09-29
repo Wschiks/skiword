@@ -47,6 +47,10 @@ Both option branches are up to date with main. Nothing was force-pushed.
 5. Pick a branch: main as is, or fast balance, or night theme.
 
 ## Numbers
-- 50 unit/playthrough tests, 17 smoke checks, 18 flow checks, 9 touch checks, random-monkey test, 3 h soak test: all pass.
-- Balance bot: every milestone inside its band, everything maxed in 76 h (target 60 to 80 h).
-- Real GPU (Apple M2 Pro, Chromium): 60 fps with 189 guests. JS cost 0.34 ms/frame.
+- 52 unit/playthrough tests, 18 smoke checks, 18 flow checks, 9 touch checks (real multi-touch), a random monkey test (5,250 actions over early/mid/late/maxed), a UI autoplayer that made 320 purchases through the real UI over 34 h of game time, and a 3 h soak test: all pass.
+- Balance bot: every milestone inside its band (worst -21%, band +/-35%), everything maxed in 76 h (target 60 to 80 h). Casual player (2 to 3 short sessions a day + offline earnings): 6 to 10 days (target 7 to 12), see `docs/casual-play.md`.
+- Real GPU (Apple M2 Pro, Chromium): 60 fps with 189 guests. JS cost 0.34 ms per frame. Startup about 2 s with the CPU throttled 6x.
+- A fresh `git clone` installs, typechecks, passes the tests and builds (verified).
+
+## Bugs I found late (by looking, not by tests) and fixed
+Camera zoom NaN when the first layout was 0x0; horizontal pan impossible when zoomed in; zone props sitting on lift cables; a CSS class collision that squeezed one card; a missing atlas frame that drew a giant ghost skier; skiers stacking in one column; "1000T" instead of "1.00Qa". Details in `docs/journal.md`.
