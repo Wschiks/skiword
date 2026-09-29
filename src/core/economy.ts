@@ -5,7 +5,7 @@ import { PARKING, HOUSING, HARD_CAP } from '../config/capacity';
 import { BUILDINGS, buildingLevelMult, BUILDING_UPGRADE } from '../config/facilities';
 import { ZONES, ZONE_PREFERENCE, zoneFeeMult, zoneCapBonus, ZONE_UPGRADE } from '../config/zones';
 import type { ZoneDef } from '../config/zones';
-import { TUNE, SEASON, INCOME_X2_MULT, GUEST } from '../config/balance';
+import { TUNE, SEASON, INCOME_X2_MULT, GUEST, HINT, ESTIMATE } from '../config/balance';
 import type { GameState, Line } from './state';
 
 export const tierDef = (t: number): LiftTier => LIFT_TIERS[Math.min(LIFT_TIERS.length, Math.max(1, t)) - 1];
@@ -95,16 +95,14 @@ export interface Estimate {
   N: number; S: number; D: number; rides: number; cycle: number; pAvg: number;
   rideIncome: number; zoneIncome: number; buildingIncome: number; total: number;
 }
-export const SOFT_K = 5;
-/** Lines with more throughput attract proportionally more guests than S_i alone (measured against the full sim). */
-export const TUNE_EST = { priceWeightExp: 2.0 };
+export const SOFT_K = ESTIMATE.softK;
 export function estimate(s: GameState, soft = false): Estimate {
   const capTotal = Math.min(parkingCapacity(s) + housingCapacity(s), HARD_CAP);
-  const N = capTotal * (0.9 + 0.07 * Math.min(1, capTotal / 100)); // typical fill grows with capacity (measured)
+  const N = capTotal * (ESTIMATE.fillBase + ESTIMATE.fillExtra * Math.min(1, capTotal / ESTIMATE.fillExtraCap)); // typical fill grows with capacity (measured)
   let S = 0, wSum = 0, sPrice = 0, sRide = 0, sSki = 0;
   for (const l of s.lines) {
     const si = throughput(l);
-    const w = Math.pow(si, TUNE_EST.priceWeightExp);
+    const w = Math.pow(si, ESTIMATE.priceWeightExp);
     S += si; wSum += w; sPrice += w * ticketPrice(l);
     sRide += w * rideTime(l); sSki += w * skiTime(areaIndex(l.areaId));
   }
@@ -112,7 +110,7 @@ export function estimate(s: GameState, soft = false): Estimate {
   const zero = { N, S, D: 0, rides: 0, cycle: 0, pAvg: 0, rideIncome: 0, zoneIncome: 0, buildingIncome: 0, total: 0 };
   if (S <= 0) return zero;
   const avgRide = sRide / wSum, avgSki = sSki / wSum;
-  const cycle = 8 + avgRide + avgSki;
+  const cycle = ESTIMATE.walkOverhead + avgRide + avgSki;
   const D = N / cycle;
   const rides = soft ? Math.pow(Math.pow(D, -SOFT_K) + Math.pow(S, -SOFT_K), -1 / SOFT_K) : Math.min(D, S);
   const pAvg = sPrice / wSum;
@@ -151,17 +149,17 @@ export function bottleneck(s: GameState): 'lifts' | 'people' | 'balanced' {
 /** Runtime bottleneck hint (spec 14.6). */
 export function bottleneckHint(s: GameState): string {
   const rt = s.rt;
-  const recentAngry = s.stats.angryRecent.filter(t => rt.time - t <= 60).length;
+  const recentAngry = s.stats.angryRecent.filter(t => rt.time - t <= HINT.angryWindow).length;
   let fill = 0, cnt = 0, sTot = 0;
   for (const l of s.lines) {
     fill += l.queue.length / queueCap(l); cnt++;
     sTot += throughput(l);
   }
   const avgFill = cnt ? fill / cnt : 0;
-  if (recentAngry >= 2 || avgFill > 0.6) return 'Queues are long. Upgrade your lifts.';
+  if (recentAngry >= HINT.angryCount || avgFill > HINT.queueFill) return 'Queues are long. Upgrade your lifts.';
   const boardedPerSec = s.lines.reduce((a, l) => a + l.departures.filter(d => rt.time - d.t0 <= 10).reduce((x, d) => x + d.n, 0), 0) / 10;
   const utilisation = sTot > 0 ? boardedPerSec / sTot : 0;
-  if (rt.time > 20 && utilisation < 0.5) {
+  if (rt.time > HINT.idleAfter && utilisation < HINT.idleUtilisation) {
     return rt.guests.length < maxPop(s) ? 'Lifts are idle. Wait for guests or add parking.' : 'Lifts are idle. Add parking or housing.';
   }
   return 'Looking good.';

@@ -2,6 +2,8 @@ import { AREAS } from './areas';
 
 export const WORLD = { w: 1200, h: 3200 };
 /** Zoom is expressed relative to the "fit width" zoom. */
+/** the camera starts this much closer than fit-width so the first screen shows big, readable lifts and guests */
+export const START_ZOOM = 1.5;
 export const ZOOM = { minFactor: 0.85, maxFactor: 3.2 };
 export const PARKING_POS = { x: 180, y: 3070 };
 export const LODGE_POS = { x: 1020, y: 3070 };

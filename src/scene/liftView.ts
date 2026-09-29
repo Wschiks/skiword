@@ -8,8 +8,8 @@ import type { GameState, Line } from '../core/game';
 const CARRIER: Record<string, string> = { drag1: 'carrier_dot', drag2: 'carrier_t', chair: 'carrier_chair', gondola: 'carrier_cabin' };
 const carrierKey = (tier: number) => (tier === 1 ? CARRIER.drag1 : tier === 2 ? CARRIER.drag2 : tier <= 6 ? CARRIER.chair : CARRIER.gondola);
 
-export const cableFrom = (l: { areaId: string; slot: number }) => { const b = slotBase(areaIndex(l.areaId), l.slot); return { x: b.x, y: b.y - 34 }; };
-export const cableTo = (l: { areaId: string; slot: number }) => { const t = slotTop(areaIndex(l.areaId), l.slot); return { x: t.x, y: t.y - 28 }; };
+export const cableFrom = (l: { areaId: string; slot: number }) => { const b = slotBase(areaIndex(l.areaId), l.slot); return { x: b.x, y: b.y - 62 }; };
+export const cableTo = (l: { areaId: string; slot: number }) => { const t = slotTop(areaIndex(l.areaId), l.slot); return { x: t.x, y: t.y - 34 }; };
 
 export class LiftView {
   private cable: Phaser.GameObjects.Graphics;
@@ -71,14 +71,14 @@ export class LiftView {
     const n = Math.max(2, Math.floor(len / 95));
     for (let k = 1; k <= n; k++) {
       const u = k / (n + 1);
-      const im = this.scene.add.image(f.x + (e.x - f.x) * u, f.y + (e.y - f.y) * u + 26, ATLAS, 'tower').setOrigin(0.5, 1).setScale(1.2 / S * 2 / 2).setDepth(f.y + (e.y - f.y) * u + 26);
+      const im = this.scene.add.image(f.x + (e.x - f.x) * u, f.y + (e.y - f.y) * u + 34, ATLAS, 'tower').setOrigin(0.5, 1).setScale(1.35 / S).setDepth(f.y + (e.y - f.y) * u + 34);
       this.statics.push(im);
     }
-    const base = this.scene.add.image(b.x, b.y - 2, ATLAS, 'station').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(b.y + 1);
-    const top = this.scene.add.image(t.x, t.y + 6, ATLAS, 'station_top').setOrigin(0.5, 1).setScale(1.5 / S).setDepth(t.y + 6);
+    const base = this.scene.add.image(b.x, b.y - 2, ATLAS, 'station').setOrigin(0.5, 1).setScale(1.95 / S).setDepth(b.y + 1);
+    const top = this.scene.add.image(t.x, t.y + 6, ATLAS, 'station_top').setOrigin(0.5, 1).setScale(1.8 / S).setDepth(t.y + 6);
     this.statics.push(base, top);
     if (!this.labels.has(l.id)) {
-      const lb = this.scene.add.text(b.x, b.y - 58, '', { fontFamily: 'system-ui, sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ffffff', stroke: '#26384d', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000);
+      const lb = this.scene.add.text(b.x, b.y - 96, '', { fontFamily: 'system-ui, sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ffffff', stroke: '#2F5F9E', strokeThickness: 5 }).setOrigin(0.5, 1).setDepth(5000);
       this.labels.set(l.id, lb);
     }
   }

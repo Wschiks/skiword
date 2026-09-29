@@ -16,6 +16,8 @@ Everything below was tried and then dropped or replaced. Tags mark the commits t
 | Dynamic `import()` of the AdMob / purchases plugins | Only needed before the plugins were installed | Static imports in `src/ads.ts`, `src/purchases.ts` (M8). Mock services are unchanged |
 | The `resolution` idea for high-DPI | Phaser 4 has no such option | Canvas is sized `css * min(2, dpr)` with `scale.setZoom(1 / dpr)` in `src/scene/MapScene.ts` |
 
+| The whole first visual style (dark rock mountain, sky, rock walls, thin flat sprites, dark locked-area overlay, white translucent top bar, orange primary buttons) | Not close to the target style the user showed (bright chunky cartoon) | New look on `main`. Old look: `git checkout v1-classic-look` (tag), screenshots in `screenshots/final` |
+
 ## Alternative branches (not merged on purpose)
 - `option/fast-balance`: everything maxed in about 25 h instead of 76 h.
 - `option/night-theme`: evening look and dark UI; `?theme=day` switches back.

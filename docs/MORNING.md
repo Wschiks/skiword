@@ -10,8 +10,13 @@ npm run dev        # open http://localhost:5173 in a phone-sized window (or your
 ```
 `?debug` adds debug keys, `?new` ignores the saved game. Tap the ringed lift, upgrade it, watch guests arrive.
 
+## Want to play on your phone?
+- Same wifi: `npm run dev` prints a `Network:` URL, open it on the phone (portrait).
+- From anywhere: I did **not** publish the game. `docs/examples/github-pages.yml` is a ready workflow if you want a Pages URL (3 steps inside the file).
+- Real app: `docs/native.md` (needs Xcode / Android Studio, which this Mac does not have yet).
+
 ## Look at these first (screenshots, no need to run anything)
-1. `screenshots/m7-polish/` : the final look (fresh start, early, mid, late game, HUD and all sheets)
+1. `screenshots/restyle-v4/` : the current look (bright chunky cartoon, after your reference images). `screenshots/final/` is the old dark look (tag `v1-classic-look`)
 2. `screenshots/m7-art-tour/` : close-ups of every zone and building
 3. `screenshots/options/` : the night theme (branch `option/night-theme`)
 4. `screenshots/README.md` : index of every step, in order, so you can see what changed and what you might want back
@@ -29,6 +34,7 @@ npm run dev        # open http://localhost:5173 in a phone-sized window (or your
 | `docs/native.md` | Android/iOS notes and the checklist before a real release |
 
 ## Git
+- Heads-up: `Wschiks/skiword` is a **public** repo on GitHub, so everything pushed is visible. I checked history for secrets: none (only Google's public AdMob *test* ids).
 - `main`: the finished build. Milestone tags: `m2-core`, `m3-map`, `m4-m6-ui`, `m7-m8-polish-native`.
 - `option/fast-balance`: everything maxed in about 25 h instead of 76 h.
 - `option/night-theme`: evening look, dark UI.
@@ -42,6 +48,10 @@ Both option branches are up to date with main. Nothing was force-pushed.
 5. Pick a branch: main as is, or fast balance, or night theme.
 
 ## Numbers
-- 50 unit/playthrough tests, 17 smoke checks, 18 flow checks, 9 touch checks, random-monkey test, 3 h soak test: all pass.
-- Balance bot: every milestone inside its band, everything maxed in 76 h (target 60 to 80 h).
-- Real GPU (Apple M2 Pro, Chromium): 60 fps with 189 guests. JS cost 0.34 ms/frame.
+- 52 unit/playthrough tests, 18 smoke checks, 18 flow checks, 9 touch checks (real multi-touch), a random monkey test (5,250 actions over early/mid/late/maxed), a UI autoplayer that made 320 purchases through the real UI over 34 h of game time, and a 3 h soak test: all pass.
+- Balance bot: every milestone inside its band (worst -21%, band +/-35%), everything maxed in 76 h (target 60 to 80 h). Casual player (2 to 3 short sessions a day + offline earnings): 6 to 10 days (target 7 to 12), see `docs/casual-play.md`.
+- Real GPU (Apple M2 Pro, Chromium): 60 fps with 189 guests. JS cost 0.34 ms per frame. Startup about 2 s with the CPU throttled 6x.
+- A fresh `git clone` installs, typechecks, passes the tests and builds (verified).
+
+## Bugs I found late (by looking, not by tests) and fixed
+Camera zoom NaN when the first layout was 0x0; horizontal pan impossible when zoomed in; zone props sitting on lift cables; a CSS class collision that squeezed one card; a missing atlas frame that drew a giant ghost skier; skiers stacking in one column; "1000T" instead of "1.00Qa". Details in `docs/journal.md`.
